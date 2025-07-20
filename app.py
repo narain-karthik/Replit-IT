@@ -53,6 +53,10 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 # Initialize the app with the extension
 db.init_app(app)
 
+# Configure WTF CSRF protection
+app.config['WTF_CSRF_ENABLED'] = True
+app.config['WTF_CSRF_TIME_LIMIT'] = None  # No time limit for CSRF tokens
+
 def utc_to_ist(dt):
     """Convert UTC datetime to IST"""
     if dt:
