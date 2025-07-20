@@ -764,21 +764,39 @@ def create_user():
     
     form = UserRegistrationForm()
     if form.validate_on_submit():
-        new_user = User(
-            username=form.username.data,
-            email=form.email.data,
-            first_name=form.first_name.data,
-            last_name=form.last_name.data,
-            department=form.department.data,
-            specialization=form.specialization.data if form.specialization.data else None,
-            role=form.role.data
-        )
-        new_user.set_password(form.password.data)
-        db.session.add(new_user)
-        db.session.commit()
+        # Check if username already exists
+        existing_user = User.query.filter_by(username=form.username.data).first()
+        if existing_user:
+            flash(f'Username "{form.username.data}" already exists. Please choose a different username.', 'error')
+            return render_template('create_user.html', form=form)
         
-        flash(f'User {new_user.username} created successfully!', 'success')
-        return redirect(url_for('manage_users'))
+        # Check if email already exists
+        existing_email = User.query.filter_by(email=form.email.data).first()
+        if existing_email:
+            flash(f'Email "{form.email.data}" already exists. Please use a different email address.', 'error')
+            return render_template('create_user.html', form=form)
+        
+        try:
+            new_user = User(
+                username=form.username.data,
+                email=form.email.data,
+                first_name=form.first_name.data,
+                last_name=form.last_name.data,
+                department=form.department.data,
+                specialization=form.specialization.data if form.specialization.data else None,
+                role=form.role.data
+            )
+            new_user.set_password(form.password.data)
+            db.session.add(new_user)
+            db.session.commit()
+            
+            flash(f'User {new_user.username} created successfully!', 'success')
+            return redirect(url_for('manage_users'))
+            
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"Error creating user: {e}")
+            flash('Error creating user. Please check the details and try again.', 'error')
     
     return render_template('create_user.html', form=form)
 
