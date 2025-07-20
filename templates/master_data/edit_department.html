@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0 text-gray-800">
+                        <i class="ri-building-line me-2"></i>Edit Department
+                    </h1>
+                    <p class="text-muted">Modify department information</p>
+                </div>
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('manage_departments') }}" class="btn btn-outline-secondary">
+                        <i class="ri-arrow-left-line"></i> Back to Departments
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="ri-pencil-line me-2"></i>Edit Department: {{ department.name }}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    {{ form.name.label(class="form-label") }}
+                                    {{ form.name(class="form-control") }}
+                                    {% if form.name.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.name.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    {{ form.code.label(class="form-label") }}
+                                    {{ form.code(class="form-control") }}
+                                    {% if form.code.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.code.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">Short code for the department (e.g., ENG, IT, HR)</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            {{ form.description.label(class="form-label") }}
+                            {{ form.description(class="form-control", rows="4") }}
+                            {% if form.description.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.description.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            {{ form.head_of_department_id.label(class="form-label") }}
+                            {{ form.head_of_department_id(class="form-select") }}
+                            {% if form.head_of_department_id.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.head_of_department_id.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">Select the Head of Department (HOD) for this department</small>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            {{ form.is_active(class="form-check-input") }}
+                            {{ form.is_active.label(class="form-check-label") }}
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            {{ form.submit(class="btn btn-primary") }}
+                            <a href="{{ url_for('manage_departments') }}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

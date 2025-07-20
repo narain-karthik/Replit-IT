@@ -4,8 +4,8 @@ from flask_login import current_user
 from werkzeug.utils import secure_filename
 from sqlalchemy import extract, and_
 from app import app, db
-from models import User, Ticket, TicketComment, Attachment, MasterDataCategory, MasterDataPriority, MasterDataStatus, EmailSettings, TimezoneSettings, BackupSettings, EmailNotificationLog
-from forms import LoginForm, TicketForm, UpdateTicketForm, CommentForm, UserRegistrationForm, AssignTicketForm, UserProfileForm, MasterDataCategoryForm, MasterDataPriorityForm, MasterDataStatusForm, EmailSettingsForm, TimezoneSettingsForm, BackupSettingsForm
+from models import User, Ticket, TicketComment, Attachment, MasterDataCategory, MasterDataPriority, MasterDataStatus, MasterDataDepartment, EmailSettings, TimezoneSettings, BackupSettings, EmailNotificationLog
+from forms import LoginForm, TicketForm, UpdateTicketForm, CommentForm, UserRegistrationForm, AssignTicketForm, UserProfileForm, MasterDataCategoryForm, MasterDataPriorityForm, MasterDataStatusForm, MasterDataDepartmentForm, EmailSettingsForm, TimezoneSettingsForm, BackupSettingsForm
 from datetime import datetime
 from utils.email import send_assignment_email  # Add this import
 from utils.timezone import utc_to_ist
@@ -1191,6 +1191,7 @@ def master_data_dashboard():
     categories = MasterDataCategory.query.all()
     priorities = MasterDataPriority.query.order_by(MasterDataPriority.level).all()
     statuses = MasterDataStatus.query.all()
+    departments = MasterDataDepartment.query.all()
     email_settings = EmailSettings.query.first()
     timezone_settings = TimezoneSettings.query.first()
     backup_settings = BackupSettings.query.first()
@@ -1206,6 +1207,7 @@ def master_data_dashboard():
                          categories=categories,
                          priorities=priorities, 
                          statuses=statuses,
+                         departments=departments,
                          email_settings=email_settings,
                          timezone_settings=timezone_settings,
                          backup_settings=backup_settings,
@@ -1393,6 +1395,78 @@ def delete_status(status_id):
         flash(f'Error deleting status: {str(e)}', 'error')
     
     return redirect(url_for('manage_statuses'))
+
+
+# Department Management Routes
+@app.route('/super_admin/master_data/departments', methods=['GET', 'POST'])
+@super_admin_required
+def manage_departments():
+    """Manage departments"""
+    form = MasterDataDepartmentForm()
+    departments = MasterDataDepartment.query.all()
+    
+    if form.validate_on_submit():
+        department = MasterDataDepartment(
+            name=form.name.data,
+            code=form.code.data.upper(),  # Store code in uppercase
+            description=form.description.data,
+            head_of_department_id=form.head_of_department_id.data if form.head_of_department_id.data else None,
+            is_active=form.is_active.data
+        )
+        try:
+            db.session.add(department)
+            db.session.commit()
+            flash(f'Department "{department.name}" created successfully!', 'success')
+            return redirect(url_for('manage_departments'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error creating department: {str(e)}', 'error')
+    
+    return render_template('master_data/departments.html', form=form, departments=departments)
+
+
+@app.route('/super_admin/master_data/departments/<int:department_id>/edit', methods=['GET', 'POST'])
+@super_admin_required
+def edit_department(department_id):
+    """Edit a department"""
+    department = MasterDataDepartment.query.get_or_404(department_id)
+    form = MasterDataDepartmentForm(obj=department)
+    
+    if form.validate_on_submit():
+        department.name = form.name.data
+        department.code = form.code.data.upper()
+        department.description = form.description.data
+        department.head_of_department_id = form.head_of_department_id.data if form.head_of_department_id.data else None
+        department.is_active = form.is_active.data
+        department.updated_at = datetime.utcnow()
+        
+        try:
+            db.session.commit()
+            flash(f'Department "{department.name}" updated successfully!', 'success')
+            return redirect(url_for('manage_departments'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating department: {str(e)}', 'error')
+    
+    return render_template('master_data/edit_department.html', form=form, department=department)
+
+
+@app.route('/super_admin/master_data/departments/<int:department_id>/delete', methods=['POST'])
+@super_admin_required
+def delete_department(department_id):
+    """Delete a department"""
+    department = MasterDataDepartment.query.get_or_404(department_id)
+    department_name = department.name
+    
+    try:
+        db.session.delete(department)
+        db.session.commit()
+        flash(f'Department "{department_name}" deleted successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting department: {str(e)}', 'error')
+    
+    return redirect(url_for('manage_departments'))
 
 
 

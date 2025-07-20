@@ -76,7 +76,23 @@
             </div>
         </div>
 
-
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Departments
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ departments|length }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="ri-building-line fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Second Row of Overview Cards -->
@@ -329,7 +345,59 @@
             </div>
         </div>
 
-
+        <!-- Departments Section -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-warning">
+                        <i class="ri-building-line me-2"></i>Departments
+                    </h6>
+                    <a href="{{ url_for('manage_departments') }}" class="btn btn-warning btn-sm">
+                        <i class="ri-add-line"></i> Manage
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if departments %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Name</th>
+                                        <th>HOD</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for department in departments[:5] %}
+                                    <tr>
+                                        <td><span class="badge bg-secondary">{{ department.code }}</span></td>
+                                        <td>{{ department.name }}</td>
+                                        <td>
+                                            {% if department.head_of_department %}
+                                                {{ department.head_of_department.full_name }}
+                                            {% else %}
+                                                <span class="text-muted">Not assigned</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if department.is_active %}
+                                                <span class="badge bg-success">Active</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Inactive</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No departments defined yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
 
         <!-- User Management Section -->
         <div class="col-lg-6 mb-4">
