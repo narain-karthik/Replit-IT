@@ -42,7 +42,7 @@ The GTN Engineering IT Helpdesk System is a comprehensive Flask-based web applic
 ### Role-Based Access Control
 - **Super Admin**: Full system access, user management, ticket oversight, reports
 - **Admin**: Complete ticket management, assignment capabilities, view all tickets
-- **HOD (Head of Department)**: Department-specific ticket viewing, can see all tickets from users in their department, comment on department tickets
+- **HOD (Head of Department)**: Department-specific ticket viewing, can see all tickets from users in their department, comment on department tickets (cannot create new tickets)
 - **User**: Ticket creation and personal ticket management
 
 ### Automatic System Detection
@@ -104,6 +104,7 @@ The GTN Engineering IT Helpdesk System is a comprehensive Flask-based web applic
 ## Changelog
 
 - July 20, 2025: **Major Feature Addition: HOD (Head of Department) Role System**
+  - Removed "New Ticket" menu and functionality from HOD dashboard (HODs cannot create tickets, only view/comment on department tickets)
   - Added new user role 'hod' with department-wise ticket viewing capabilities
   - HODs can view all tickets from users in their department
   - HODs can comment on department tickets and view all ticket updates

@@ -97,6 +97,12 @@
                         <a href="{{ url_for('reports_dashboard') }}"><i class="ri-bar-chart-line"></i> Reports</a>
                         <a href="{{ url_for('master_data_dashboard') }}"><i class="ri-database-2-line"></i> Master Data</a>
                         <a href="{{ url_for('logout') }}"><i class="ri-logout-box-line"></i> Logout</a>
+                    {% elif session.role == 'admin' %}
+                        <a href="{{ url_for('admin_dashboard') }}"><i class="ri-dashboard-line"></i> Dashboard</a>
+                        <a href="{{ url_for('logout') }}"><i class="ri-logout-box-line"></i> Logout</a>
+                    {% elif session.role == 'hod' %}
+                        <a href="{{ url_for('hod_dashboard') }}"><i class="ri-team-line"></i> Department Dashboard</a>
+                        <a href="{{ url_for('logout') }}"><i class="ri-logout-box-line"></i> Logout</a>
                     {% else %}
                         <a href="{{ url_for('user_dashboard') }}"><i class="ri-dashboard-line"></i> My Tickets</a>
                         <a href="{{ url_for('create_ticket') }}"><i class="ri-add-line"></i> New Ticket</a>
