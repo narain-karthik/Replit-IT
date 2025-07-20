@@ -1,0 +1,827 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Users - GTN Engineering IT Helpdesk{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header mb-4">
+        <div class="row align-items-center">
+            <div class="col">
+                <h1 class="page-title">
+                    <i class="ri-team-line text-primary"></i>
+                    User Management
+                </h1>
+                <p class="page-subtitle">Manage system users, roles, and permissions</p>
+            </div>
+            <div class="col-auto">
+                <div class="header-actions">
+                    <a href="{{ url_for('create_user') }}" class="btn btn-primary btn-lg">
+                        <i class="ri-user-add-line"></i>
+                        Create New User
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon bg-primary">
+                    <i class="ri-team-line"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ users | length }}</h3>
+                    <p>Total Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon bg-success">
+                    <i class="ri-shield-user-line"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ users | selectattr('role', 'equalto', 'super_admin') | list | length }}</h3>
+                    <p>Super Admins</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon bg-info">
+                    <i class="ri-user-line"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ users | selectattr('role', 'equalto', 'user') | list | length }}</h3>
+                    <p>Regular Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon bg-warning">
+                    <i class="ri-time-line"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>N/A</h3>
+                    <p>New This Month</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Management Card -->
+    <div class="card users-table-card">
+        <div class="card-header">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h5 class="card-title mb-0">
+                        <i class="ri-database-line text-primary"></i>
+                        System Users
+                    </h5>
+                    <p class="card-subtitle">Manage user accounts, roles, and permissions</p>
+                </div>
+                <div class="col-auto">
+                    <div class="table-controls">
+                        <div class="search-box">
+                            <i class="ri-search-line"></i>
+                            <input type="text" id="userSearch" placeholder="Search users..." class="form-control">
+                        </div>
+                        <div class="filter-dropdown">
+                            <select id="roleFilter" class="form-select">
+                                <option value="all">All Roles</option>
+                                <option value="user">Users</option>
+                                <option value="super_admin">Super Admins</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            {% if users %}
+                <div class="table-responsive">
+                    <table class="table table-hover users-table" id="usersTable">
+                        <thead class="table-header">
+                            <tr>
+                                <th class="sortable" data-sort="id">
+                                    <i class="ri-hashtag"></i>
+                                    ID
+                                    <i class="ri-arrow-up-down-line sort-icon"></i>
+                                </th>
+                                <th class="sortable" data-sort="username">
+                                    <i class="ri-user-line"></i>
+                                    Username
+                                    <i class="ri-arrow-up-down-line sort-icon"></i>
+                                </th>
+                                <th class="sortable" data-sort="name">
+                                    <i class="ri-account-circle-line"></i>
+                                    Full Name
+                                    <i class="ri-arrow-up-down-line sort-icon"></i>
+                                </th>
+                                <th class="sortable" data-sort="email">
+                                    <i class="ri-mail-line"></i>
+                                    Email
+                                    <i class="ri-arrow-up-down-line sort-icon"></i>
+                                </th>
+                                <th class="sortable" data-sort="department">
+                                    <i class="ri-building-line"></i>
+                                    Department
+                                    <i class="ri-arrow-up-down-line sort-icon"></i>
+                                </th>
+                                <th class="sortable" data-sort="role">
+                                    <i class="ri-shield-line"></i>
+                                    Role
+                                    <i class="ri-arrow-up-down-line sort-icon"></i>
+                                </th>
+                                <th>
+                                    <i class="ri-ticket-line"></i>
+                                    Tickets
+                                </th>
+                                <th class="sortable" data-sort="created">
+                                    <i class="ri-calendar-line"></i>
+                                    Created
+                                    <i class="ri-arrow-up-down-line sort-icon"></i>
+                                </th>
+                                <th class="actions-column">
+                                    <i class="ri-settings-line"></i>
+                                    Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                                <tr class="user-row" data-role="{{ user.role }}" data-name="{{ user.full_name }}" data-username="{{ user.username }}" data-email="{{ user.email }}">
+                                    <td class="user-id">
+                                        <span class="id-badge">#{{ user.id }}</span>
+                                    </td>
+                                    <td class="username-cell">
+                                        <div class="user-avatar">
+                                            <div class="avatar-circle">
+                                                {{ user.first_name[0] if user.first_name else 'U' }}{{ user.last_name[0] if user.last_name else '' }}
+                                            </div>
+                                            <div class="user-info">
+                                                <strong>{{ user.username }}</strong>
+                                                {% if user.system_name %}
+                                                    <small class="text-muted d-block">
+                                                        <i class="ri-computer-line"></i>
+                                                        {{ user.system_name }}
+                                                    </small>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="name-cell">
+                                        <div class="user-name">
+                                            {{ user.full_name }}
+                                        </div>
+                                    </td>
+                                    <td class="email-cell">
+                                        <div class="email-info">
+                                            <i class="ri-mail-line text-muted"></i>
+                                            {{ user.email }}
+                                        </div>
+                                    </td>
+                                    <td class="department-cell">
+                                        {% if user.department %}
+                                            <span class="department-badge">
+                                                <i class="ri-building-line"></i>
+                                                {{ user.department }}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted">Not specified</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="role-cell">
+                                        {% if user.role == 'super_admin' %}
+                                            <span class="role-badge admin-role">
+                                                <i class="ri-shield-star-line"></i>
+                                                Super Admin
+                                            </span>
+                                        {% else %}
+                                            <span class="role-badge user-role">
+                                                <i class="ri-user-line"></i>
+                                                User
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="tickets-cell">
+                                        <div class="ticket-stats">
+                                            <span class="ticket-count">
+                                                <i class="ri-ticket-line"></i>
+                                                {{ user.tickets | length }}
+                                            </span>
+                                            {% if user.assigned_tickets %}
+                                                <span class="assigned-count">
+                                                    <i class="ri-user-received-line"></i>
+                                                    {{ user.assigned_tickets | length }}
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td class="created-cell">
+                                        <div class="created-info">
+                                            <span class="created-date">{{ user.created_at | to_ist }}</span>
+                                            {% if user.ip_address %}
+                                                <small class="text-muted d-block">
+                                                    <i class="ri-map-pin-line"></i>
+                                                    {{ user.ip_address }}
+                                                </small>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td class="actions-cell">
+                                        <div class="action-buttons">
+                                            <div class="btn-group" role="group">
+                                                <a href="{{ url_for('view_user', user_id=user.id) }}" 
+                                                   class="btn btn-outline-primary btn-sm" 
+                                                   title="View Details">
+                                                    <i class="ri-eye-line"></i>
+                                                </a>
+                                                <a href="{{ url_for('edit_user', user_id=user.id) }}" 
+                                                   class="btn btn-outline-secondary btn-sm" 
+                                                   title="Edit User">
+                                                    <i class="ri-edit-line"></i>
+                                                </a>
+                                                <button type="button" 
+                                                        class="btn btn-outline-danger btn-sm" 
+                                                        onclick="confirmDeleteUser({{ user.id }}, '{{ user.username }}')"
+                                                        title="Delete User">
+                                                    <i class="ri-delete-bin-line"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="ri-user-line"></i>
+                    </div>
+                    <h4>No Users Found</h4>
+                    <p>There are no users in the system yet. Create the first user to get started.</p>
+                    <a href="{{ url_for('create_user') }}" class="btn btn-primary">
+                        <i class="ri-user-add-line"></i>
+                        Create First User
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">
+                    <i class="ri-error-warning-line text-danger"></i>
+                    Confirm User Deletion
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="ri-alert-line"></i>
+                    <strong>Warning:</strong> This action cannot be undone.
+                </div>
+                <p>Are you sure you want to delete the user <strong id="deleteUserName"></strong>?</p>
+                <p class="text-muted">This will permanently remove the user account and all associated data.</p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteUserForm" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="ri-delete-bin-line"></i>
+                        Delete User
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Manage Users Specific Styles */
+.page-header {
+    padding: 2rem 0 1rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.page-subtitle {
+    color: #6c757d;
+    font-size: 1.1rem;
+    margin-bottom: 0;
+}
+
+.header-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+/* Stats Cards */
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.stat-content h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+}
+
+.stat-content p {
+    color: #6c757d;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Users Table Card */
+.users-table-card {
+    border: none;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border-radius: 12px;
+}
+
+.card-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    padding: 1.5rem;
+}
+
+.card-title {
+    color: #2c3e50;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-subtitle {
+    color: #6c757d;
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+}
+
+.table-controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.search-box {
+    position: relative;
+    width: 250px;
+}
+
+.search-box i {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    z-index: 2;
+}
+
+.search-box input {
+    padding-left: 2.5rem;
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.search-box input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.filter-dropdown select {
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    padding: 0.5rem 1rem;
+    min-width: 150px;
+}
+
+/* Table Styles */
+.users-table {
+    margin-bottom: 0;
+}
+
+.table-header {
+    background: #f1f3f4;
+}
+
+.table-header th {
+    border: none;
+    padding: 1rem;
+    font-weight: 600;
+    color: #2c3e50;
+    white-space: nowrap;
+}
+
+.sortable {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.sortable:hover {
+    background: #e9ecef;
+}
+
+.sort-icon {
+    margin-left: 0.5rem;
+    opacity: 0.5;
+    font-size: 0.8rem;
+}
+
+.sortable.sorted .sort-icon {
+    opacity: 1;
+    color: #007bff;
+}
+
+.user-row {
+    transition: all 0.3s ease;
+}
+
+.user-row:hover {
+    background: #f8f9fa;
+}
+
+.user-row td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+/* User ID */
+.id-badge {
+    background: #e9ecef;
+    color: #495057;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.875rem;
+}
+
+/* Username Cell */
+.user-avatar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.user-info strong {
+    color: #2c3e50;
+}
+
+/* Email Cell */
+.email-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6c757d;
+}
+
+/* Department Cell */
+.department-badge {
+    background: #e7f3ff;
+    color: #0066cc;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* Role Cell */
+.role-badge {
+    padding: 0.375rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.admin-role {
+    background: #d4edda;
+    color: #155724;
+}
+
+.user-role {
+    background: #cce7ff;
+    color: #004085;
+}
+
+/* Tickets Cell */
+.ticket-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.ticket-count, .assigned-count {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+/* Created Cell */
+.created-info {
+    font-size: 0.875rem;
+}
+
+.created-date {
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+/* Actions Cell */
+.action-buttons .btn-group {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.action-buttons .btn {
+    border: none;
+    padding: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.action-buttons .btn:hover {
+    transform: scale(1.1);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #6c757d;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    color: #dee2e6;
+    margin-bottom: 1rem;
+}
+
+.empty-state h4 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+}
+
+/* Modal Styles */
+.modal-content {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header, .modal-footer {
+    background: #f8f9fa;
+}
+
+.modal-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .table-controls {
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+    }
+    
+    .search-box, .filter-dropdown select {
+        width: 100%;
+    }
+    
+    .header-actions {
+        margin-top: 1rem;
+        width: 100%;
+    }
+    
+    .btn-lg {
+        width: 100%;
+    }
+    
+    .users-table {
+        font-size: 0.875rem;
+    }
+    
+    .user-avatar {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+    }
+    
+    .avatar-circle {
+        width: 30px;
+        height: 30px;
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .table-responsive {
+        border-radius: 0;
+    }
+    
+    .users-table th, .users-table td {
+        padding: 0.5rem;
+    }
+    
+    .action-buttons .btn-group {
+        flex-direction: column;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const userSearch = document.getElementById('userSearch');
+    const roleFilter = document.getElementById('roleFilter');
+    const usersTable = document.getElementById('usersTable');
+    const userRows = usersTable.querySelectorAll('.user-row');
+    
+    // Search functionality
+    function filterUsers() {
+        const searchTerm = userSearch.value.toLowerCase();
+        const selectedRole = roleFilter.value;
+        
+        userRows.forEach(row => {
+            const name = row.dataset.name.toLowerCase();
+            const username = row.dataset.username.toLowerCase();
+            const email = row.dataset.email.toLowerCase();
+            const role = row.dataset.role;
+            
+            const matchesSearch = name.includes(searchTerm) || 
+                                 username.includes(searchTerm) || 
+                                 email.includes(searchTerm);
+            const matchesRole = selectedRole === 'all' || role === selectedRole;
+            
+            if (matchesSearch && matchesRole) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+    
+    userSearch.addEventListener('input', filterUsers);
+    roleFilter.addEventListener('change', filterUsers);
+    
+    // Sorting functionality
+    const sortableHeaders = document.querySelectorAll('.sortable');
+    let currentSort = { column: null, direction: 'asc' };
+    
+    sortableHeaders.forEach(header => {
+        header.addEventListener('click', function() {
+            const sortBy = this.dataset.sort;
+            
+            // Reset all headers
+            sortableHeaders.forEach(h => h.classList.remove('sorted'));
+            
+            // Toggle sort direction
+            if (currentSort.column === sortBy) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.direction = 'asc';
+            }
+            
+            currentSort.column = sortBy;
+            this.classList.add('sorted');
+            
+            // Update sort icon
+            const icon = this.querySelector('.sort-icon');
+            if (currentSort.direction === 'asc') {
+                icon.className = 'ri-arrow-up-line sort-icon';
+            } else {
+                icon.className = 'ri-arrow-down-line sort-icon';
+            }
+            
+            sortTable(sortBy, currentSort.direction);
+        });
+    });
+    
+    function sortTable(column, direction) {
+        const tbody = usersTable.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('.user-row'));
+        
+        rows.sort((a, b) => {
+            let aVal, bVal;
+            
+            switch (column) {
+                case 'id':
+                    aVal = parseInt(a.querySelector('.id-badge').textContent.replace('#', ''));
+                    bVal = parseInt(b.querySelector('.id-badge').textContent.replace('#', ''));
+                    break;
+                case 'username':
+                    aVal = a.dataset.username.toLowerCase();
+                    bVal = b.dataset.username.toLowerCase();
+                    break;
+                case 'name':
+                    aVal = a.dataset.name.toLowerCase();
+                    bVal = b.dataset.name.toLowerCase();
+                    break;
+                case 'email':
+                    aVal = a.dataset.email.toLowerCase();
+                    bVal = b.dataset.email.toLowerCase();
+                    break;
+                case 'role':
+                    aVal = a.dataset.role;
+                    bVal = b.dataset.role;
+                    break;
+                default:
+                    return 0;
+            }
+            
+            if (direction === 'asc') {
+                return aVal > bVal ? 1 : -1;
+            } else {
+                return aVal < bVal ? 1 : -1;
+            }
+        });
+        
+        // Reorder rows
+        rows.forEach(row => tbody.appendChild(row));
+    }
+});
+
+// Delete user confirmation
+function confirmDeleteUser(userId, username) {
+    const modal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
+    const userNameSpan = document.getElementById('deleteUserName');
+    const deleteForm = document.getElementById('deleteUserForm');
+    
+    userNameSpan.textContent = username;
+    deleteForm.action = `/delete-user/${userId}`;
+    
+    modal.show();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0 text-gray-800">
+                        <i class="ri-settings-3-line me-2"></i>Manage System Settings
+                    </h1>
+                    <p class="text-muted">Configure system-wide settings and parameters</p>
+                </div>
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('master_data_dashboard') }}" class="btn btn-outline-secondary">
+                        <i class="ri-arrow-left-line"></i> Back to Master Data
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Add New Setting Form -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-dark">
+                        <i class="ri-add-line me-2"></i>Add New Setting
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="form-group mb-3">
+                            {{ form.setting_key.label(class="form-label") }}
+                            {{ form.setting_key(class="form-control") }}
+                            {% if form.setting_key.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.setting_key.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">Use underscore_format (e.g., max_file_size)</small>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            {{ form.setting_type.label(class="form-label") }}
+                            {{ form.setting_type(class="form-select") }}
+                            {% if form.setting_type.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.setting_type.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            {{ form.setting_value.label(class="form-label") }}
+                            {{ form.setting_value(class="form-control", rows="3") }}
+                            {% if form.setting_value.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.setting_value.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">For JSON type, use valid JSON format</small>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            {{ form.description.label(class="form-label") }}
+                            {{ form.description(class="form-control", rows="2") }}
+                            {% if form.description.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.description.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-check mb-3">
+                            {{ form.is_active(class="form-check-input") }}
+                            {{ form.is_active.label(class="form-check-label") }}
+                        </div>
+
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-dark") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Existing Settings -->
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-dark">
+                        <i class="ri-list-check-3"></i> System Settings
+                    </h6>
+                    <span class="badge bg-dark">{{ settings|length }} Total</span>
+                </div>
+                <div class="card-body">
+                    {% if settings %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Setting Key</th>
+                                        <th>Type</th>
+                                        <th>Value</th>
+                                        <th>Description</th>
+                                        <th>Status</th>
+                                        <th>Last Updated</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for setting in settings %}
+                                    <tr>
+                                        <td>
+                                            <code class="text-primary">{{ setting.setting_key }}</code>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary">{{ setting.setting_type }}</span>
+                                        </td>
+                                        <td>
+                                            <div style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">
+                                                {% if setting.setting_value %}
+                                                    {% if setting.setting_value|length > 50 %}
+                                                        <span title="{{ setting.setting_value }}">{{ setting.setting_value[:50] }}...</span>
+                                                    {% else %}
+                                                        {{ setting.setting_value }}
+                                                    {% endif %}
+                                                {% else %}
+                                                    <span class="text-muted">Empty</span>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if setting.description %}
+                                                <small>{{ setting.description }}</small>
+                                            {% else %}
+                                                <span class="text-muted">No description</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if setting.is_active %}
+                                                <span class="badge bg-success">
+                                                    <i class="ri-check-line"></i> Active
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">
+                                                    <i class="ri-close-line"></i> Inactive
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">
+                                                {{ setting.updated_at.strftime('%Y-%m-%d %H:%M') if setting.updated_at else 'Never' }}
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <button type="button" class="btn btn-outline-primary btn-sm" title="Edit Setting">
+                                                    <i class="ri-edit-line"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-outline-info btn-sm" title="View Full Value">
+                                                    <i class="ri-eye-line"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="ri-settings-3-line fa-3x text-gray-300 mb-3"></i>
+                            <h5 class="text-muted">No Settings Found</h5>
+                            <p class="text-muted">Start by creating your first system setting using the form on the left.</p>
+                            <div class="mt-3">
+                                <h6 class="text-muted">Common Settings Examples:</h6>
+                                <ul class="list-unstyled text-muted small">
+                                    <li><code>max_file_size</code> - Maximum upload file size</li>
+                                    <li><code>session_timeout</code> - User session timeout duration</li>
+                                    <li><code>email_notifications</code> - Enable/disable email alerts</li>
+                                    <li><code>maintenance_mode</code> - System maintenance status</li>
+                                </ul>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.text-gray-800 {
+    color: #5a5c69 !important;
+}
+
+.text-gray-300 {
+    color: #dddfeb !important;
+}
+
+.fa-3x {
+    font-size: 3em;
+}
+
+code.text-primary {
+    background-color: #e3f2fd;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.9em;
+}
+</style>
+{% endblock %}

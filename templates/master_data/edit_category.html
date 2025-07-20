@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0 text-gray-800">
+                        <i class="ri-edit-line me-2"></i>Edit Category
+                    </h1>
+                    <p class="text-muted">Update category: <strong>{{ category.name }}</strong></p>
+                </div>
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('manage_categories') }}" class="btn btn-outline-secondary">
+                        <i class="ri-arrow-left-line"></i> Back to Categories
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="ri-edit-line me-2"></i>Edit Category Details
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="form-group mb-3">
+                            {{ form.name.label(class="form-label") }}
+                            {{ form.name(class="form-control") }}
+                            {% if form.name.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.name.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            {{ form.description.label(class="form-label") }}
+                            {{ form.description(class="form-control", rows="3") }}
+                            {% if form.description.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.description.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-check mb-3">
+                            {{ form.is_active(class="form-check-input") }}
+                            {{ form.is_active.label(class="form-check-label") }}
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('manage_categories') }}" class="btn btn-secondary me-md-2">
+                                <i class="ri-close-line"></i> Cancel
+                            </a>
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Category Info -->
+                <div class="card-footer bg-light">
+                    <div class="row text-muted small">
+                        <div class="col-md-6">
+                            <strong>Created:</strong> {{ category.created_at.strftime('%Y-%m-%d %H:%M') if category.created_at else 'Unknown' }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Last Updated:</strong> {{ category.updated_at.strftime('%Y-%m-%d %H:%M') if category.updated_at else 'Never' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.text-gray-800 {
+    color: #5a5c69 !important;
+}
+</style>
+{% endblock %}

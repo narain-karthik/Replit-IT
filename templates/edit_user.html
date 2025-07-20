@@ -1,0 +1,508 @@
+{% extends "base.html" %}
+
+{% block title %}Edit User - {{ user.full_name }} - GTN Engineering IT Helpdesk{% endblock %}
+
+{% block content %}
+<style>
+    .user-edit-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+    
+    .edit-user-card {
+        background: rgba(255, 255, 255, 0.98);
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        overflow: hidden;
+    }
+    
+    .user-header {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        padding: 2rem;
+        border-radius: 20px 20px 0 0;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .user-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 100%;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        opacity: 0.3;
+    }
+    
+    .user-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: white;
+        margin-bottom: 1rem;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .form-floating {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-floating > .form-control {
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 1rem 0.75rem;
+        height: calc(3.5rem + 2px);
+        transition: all 0.3s ease;
+    }
+    
+    .form-floating > .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        transform: translateY(-2px);
+    }
+    
+    .form-floating > label {
+        padding: 1rem 0.75rem;
+        color: #6c757d;
+        font-weight: 500;
+    }
+    
+    .form-select {
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 1rem 0.75rem;
+        transition: all 0.3s ease;
+        height: calc(3.5rem + 2px);
+    }
+    
+    .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .role-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+    }
+    
+    .role-user {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        color: white;
+    }
+    
+    .role-super-admin {
+        background: linear-gradient(45deg, #dc3545, #fd7e14);
+        color: white;
+    }
+    
+    .info-card {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        border: none;
+        border-radius: 15px;
+        padding: 2rem;
+        height: 100%;
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .info-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-size: 1.25rem;
+    }
+    
+    .btn-save {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        border: none;
+        border-radius: 25px;
+        padding: 0.8rem 2rem;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    }
+    
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        color: white;
+    }
+    
+    .btn-outline-secondary {
+        border: 2px solid #6c757d;
+        border-radius: 25px;
+        padding: 0.8rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(108, 117, 125, 0.3);
+    }
+    
+    .password-strength {
+        margin-top: 0.5rem;
+    }
+    
+    .strength-meter {
+        height: 4px;
+        border-radius: 2px;
+        background: #e9ecef;
+        overflow: hidden;
+    }
+    
+    .strength-bar {
+        height: 100%;
+        transition: all 0.3s ease;
+        border-radius: 2px;
+    }
+    
+    .animate-fade-in {
+        animation: fadeIn 0.8s ease-out;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<div class="user-edit-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-xl-10">
+                <div class="edit-user-card animate-fade-in">
+                    <!-- User Header -->
+                    <div class="user-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <div class="user-avatar">
+                                    <i class="ri-user-settings-line"></i>
+                                </div>
+                                <div class="ms-3">
+                                    <h2 class="mb-1">Edit User Profile</h2>
+                                    <p class="mb-0 opacity-75">Update {{ user.full_name }}'s information</p>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a href="{{ url_for('view_user', user_id=user.id) }}" class="btn btn-light btn-sm">
+                                    <i class="ri-eye-line me-1"></i> View Details
+                                </a>
+                                <a href="{{ url_for('manage_users') }}" class="btn btn-outline-light btn-sm">
+                                    <i class="ri-arrow-left-line me-1"></i> Back to Users
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-0">
+                        <!-- Edit Form -->
+                        <div class="col-lg-8">
+                            <div class="p-4">
+                                <form method="POST" novalidate id="editUserForm">
+                                    {{ form.hidden_tag() }}
+
+                                    <!-- Username -->
+                                    <div class="form-floating">
+                                        {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else ""), id="username") }}
+                                        {{ form.username.label(for="username") }}
+                                        {% if form.username.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.username.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Role Selection -->
+                                    <div class="mb-3">
+                                        <label for="role" class="form-label fw-bold">
+                                            <i class="ri-shield-user-line me-2"></i>User Role
+                                        </label>
+                                        {{ form.role(class="form-select" + (" is-invalid" if form.role.errors else ""), id="role") }}
+                                        <div class="role-preview mt-2">
+                                            <span class="role-badge role-user" id="roleBadge">User</span>
+                                        </div>
+                                        {% if form.role.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.role.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Name Fields -->
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                {{ form.first_name(class="form-control" + (" is-invalid" if form.first_name.errors else ""), id="firstName") }}
+                                                {{ form.first_name.label(for="firstName") }}
+                                                {% if form.first_name.errors %}
+                                                    <div class="invalid-feedback">
+                                                        {% for error in form.first_name.errors %}
+                                                            {{ error }}
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                {{ form.last_name(class="form-control" + (" is-invalid" if form.last_name.errors else ""), id="lastName") }}
+                                                {{ form.last_name.label(for="lastName") }}
+                                                {% if form.last_name.errors %}
+                                                    <div class="invalid-feedback">
+                                                        {% for error in form.last_name.errors %}
+                                                            {{ error }}
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Email -->
+                                    <div class="form-floating">
+                                        {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), id="email") }}
+                                        {{ form.email.label(for="email") }}
+                                        {% if form.email.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.email.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Department -->
+                                    <div class="form-floating">
+                                        {{ form.department(class="form-control", id="department") }}
+                                        {{ form.department.label(for="department") }}
+                                    </div>
+
+                                    <!-- Specialization -->
+                                    <div class="form-floating">
+                                        {{ form.specialization(class="form-select", id="specialization") }}
+                                        {{ form.specialization.label(for="specialization") }}
+                                    </div>
+
+                                    <!-- System Name -->
+                                    <div class="form-floating">
+                                        {{ form.system_name(class="form-control", id="systemName") }}
+                                        {{ form.system_name.label(for="systemName") }}
+                                    </div>
+
+                                    <!-- Password -->
+                                    <div class="form-floating">
+                                        {{ form.password(class="form-control", id="password", placeholder="Leave blank to keep current password") }}
+                                        {{ form.password.label(for="password") }}
+                                        <div class="password-strength" id="passwordStrength" style="display: none;">
+                                            <div class="strength-meter">
+                                                <div class="strength-bar" id="strengthBar"></div>
+                                            </div>
+                                            <small class="text-muted" id="strengthText">Password strength</small>
+                                        </div>
+                                    </div>
+
+                                    <!-- Submit Button -->
+                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                                        <a href="{{ url_for('manage_users') }}" class="btn btn-outline-secondary me-md-2">
+                                            <i class="ri-close-line me-1"></i> Cancel
+                                        </a>
+                                        {{ form.submit(class="btn btn-save") }}
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- User Info Sidebar -->
+                        <div class="col-lg-4">
+                            <div class="info-card">
+                                <h5 class="mb-4">
+                                    <i class="ri-information-line me-2"></i>Current Information
+                                </h5>
+
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="ri-user-line"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted">User ID</small>
+                                        <div class="fw-bold">#{{ user.id }}</div>
+                                    </div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="ri-calendar-line"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted">Member Since</small>
+                                        <div class="fw-bold">{{ user.created_at.strftime('%B %d, %Y') if user.created_at else 'N/A' }}</div>
+                                    </div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="ri-ticket-line"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted">Total Tickets</small>
+                                        <div class="fw-bold">{{ user.tickets|length }}</div>
+                                    </div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="ri-computer-line"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted">System Name</small>
+                                        <div class="fw-bold">{{ user.system_name or 'Not set' }}</div>
+                                    </div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="ri-global-line"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted">Last IP</small>
+                                        <div class="fw-bold">{{ user.ip_address or 'N/A' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Role badge update
+    const roleSelect = document.getElementById('role');
+    const roleBadge = document.getElementById('roleBadge');
+    
+    function updateRoleBadge() {
+        const selectedRole = roleSelect.value;
+        roleBadge.textContent = selectedRole === 'super_admin' ? 'Super Admin' : 'User';
+        roleBadge.className = 'role-badge ' + (selectedRole === 'super_admin' ? 'role-super-admin' : 'role-user');
+    }
+    
+    roleSelect.addEventListener('change', updateRoleBadge);
+    updateRoleBadge();
+    
+    // Password strength indicator
+    const passwordInput = document.getElementById('password');
+    const strengthMeter = document.getElementById('passwordStrength');
+    const strengthBar = document.getElementById('strengthBar');
+    const strengthText = document.getElementById('strengthText');
+    
+    passwordInput.addEventListener('input', function() {
+        const password = this.value;
+        
+        if (password.length === 0) {
+            strengthMeter.style.display = 'none';
+            return;
+        }
+        
+        strengthMeter.style.display = 'block';
+        
+        let strength = 0;
+        let text = '';
+        let color = '';
+        
+        if (password.length >= 8) strength++;
+        if (/[a-z]/.test(password)) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+        if (/[0-9]/.test(password)) strength++;
+        if (/[^A-Za-z0-9]/.test(password)) strength++;
+        
+        switch (strength) {
+            case 0:
+            case 1:
+                text = 'Very Weak';
+                color = '#dc3545';
+                break;
+            case 2:
+                text = 'Weak';
+                color = '#fd7e14';
+                break;
+            case 3:
+                text = 'Fair';
+                color = '#ffc107';
+                break;
+            case 4:
+                text = 'Good';
+                color = '#20c997';
+                break;
+            case 5:
+                text = 'Strong';
+                color = '#28a745';
+                break;
+        }
+        
+        strengthBar.style.width = (strength * 20) + '%';
+        strengthBar.style.background = color;
+        strengthText.textContent = text;
+        strengthText.style.color = color;
+    });
+    
+    // Form validation
+    const form = document.getElementById('editUserForm');
+    form.addEventListener('submit', function(e) {
+        const username = document.getElementById('username').value.trim();
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName = document.getElementById('lastName').value.trim();
+        const email = document.getElementById('email').value.trim();
+        
+        if (!username || !firstName || !lastName || !email) {
+            e.preventDefault();
+            alert('Please fill in all required fields.');
+        }
+    });
+});
+</script>
+{% endblock %}

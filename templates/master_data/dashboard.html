@@ -1,0 +1,721 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0 text-gray-800">
+                        <i class="ri-database-2-line me-2"></i>Master Data Management
+                    </h1>
+                    <p class="text-muted">Control all system configuration and reference data</p>
+                </div>
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('super_admin_dashboard') }}" class="btn btn-outline-secondary">
+                        <i class="ri-arrow-left-line"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overview Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Categories
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ categories|length }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="ri-folder-line fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Priorities
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ priorities|length }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="ri-flag-line fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Statuses
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ statuses|length }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="ri-pulse-line fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <!-- Second Row of Overview Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-secondary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
+                                System Users
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ users_count if users_count is defined else 0 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="ri-team-line fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-secondary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
+                                Email Settings
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {% if email_settings and email_settings.is_active %}
+                                    <span class="text-success">Active</span>
+                                {% else %}
+                                    <span class="text-warning">Inactive</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="ri-mail-line fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Timezone Settings
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {% if timezone_settings and timezone_settings.is_active %}
+                                    <span class="text-success">Active</span>
+                                {% else %}
+                                    <span class="text-warning">Inactive</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="ri-time-line fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Backup Settings
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {% if backup_settings and backup_settings.is_active %}
+                                    <span class="text-success">Active</span>
+                                {% else %}
+                                    <span class="text-warning">Inactive</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="ri-database-line fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Management Sections -->
+    <div class="row">
+        <!-- Categories Section -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="ri-folder-line me-2"></i>Ticket Categories
+                    </h6>
+                    <a href="{{ url_for('manage_categories') }}" class="btn btn-primary btn-sm">
+                        <i class="ri-add-line"></i> Manage
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if categories %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for category in categories[:5] %}
+                                    <tr>
+                                        <td>{{ category.name }}</td>
+                                        <td>
+                                            {% if category.is_active %}
+                                                <span class="badge bg-success">Active</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Inactive</span>
+                                            {% endif %}
+                                        </td>
+                                       <td>{{ category.created_at | to_ist }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No categories defined yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Priorities Section -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-success">
+                        <i class="ri-flag-line me-2"></i>Priority Levels
+                    </h6>
+                    <a href="{{ url_for('manage_priorities') }}" class="btn btn-success btn-sm">
+                        <i class="ri-add-line"></i> Manage
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if priorities %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Level</th>
+                                        <th>Name</th>
+                                        <th>Color</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for priority in priorities[:5] %}
+                                    <tr>
+                                        <td>{{ priority.level }}</td>
+                                        <td>{{ priority.name }}</td>
+                                        <td>
+                                            {% if priority.color_code %}
+                                                <span class="badge" style="background-color: {{ priority.color_code }};">{{ priority.color_code }}</span>
+                                            {% else %}
+                                                <span class="text-muted">No color</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if priority.is_active %}
+                                                <span class="badge bg-success">Active</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Inactive</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No priorities defined yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Statuses Section -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-info">
+                        <i class="ri-pulse-line me-2"></i>Ticket Statuses
+                    </h6>
+                    <a href="{{ url_for('manage_statuses') }}" class="btn btn-info btn-sm">
+                        <i class="ri-add-line"></i> Manage
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if statuses %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Color</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for status in statuses[:5] %}
+                                    <tr>
+                                        <td>{{ status.name }}</td>
+                                        <td>
+                                            {% if status.color_code %}
+                                                <span class="badge" style="background-color: {{ status.color_code }};">{{ status.color_code }}</span>
+                                            {% else %}
+                                                <span class="text-muted">No color</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if status.is_active %}
+                                                <span class="badge bg-success">Active</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Inactive</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ status.created_at | to_ist }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No statuses defined yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- User Management Section -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-secondary">
+                        <i class="ri-team-line me-2"></i>System Users
+                    </h6>
+                    <a href="{{ url_for('manage_users') }}" class="btn btn-secondary btn-sm">
+                        <i class="ri-add-line"></i> Manage
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if users %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Role</th>
+                                        <th>Department</th>
+                                        <th>Created</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for user in users[:5] %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ user.first_name }} {{ user.last_name }}</strong>
+                                            <br><small class="text-muted">{{ user.email }}</small>
+                                        </td>
+                                        <td>
+                                            {% if user.role == 'super_admin' %}
+                                                <span class="badge bg-danger">Super Admin</span>
+                                            {% else %}
+                                                <span class="badge bg-primary">User</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ user.department or 'Not assigned' }}</td>
+                                       <td>{{ user.created_at | to_ist }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% if users|length > 5 %}
+                            <div class="text-center mt-2">
+                                <small class="text-muted">Showing 5 of {{ users|length }} users</small>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-muted">No users found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Settings Section -->
+    <div class="row">
+        <!-- Email Settings Section -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-secondary">
+                        <i class="ri-mail-line me-2"></i>Email Settings
+                    </h6>
+                    <a href="{{ url_for('manage_email_settings') }}" class="btn btn-secondary btn-sm">
+                        <i class="ri-settings-line"></i> Manage
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if email_settings %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Setting</th>
+                                        <th>Value</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>SMTP Server</td>
+                                        <td>{{ email_settings.smtp_server }}</td>
+                                        <td>
+                                            {% if email_settings.is_active %}
+                                                <span class="badge bg-success">Active</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Inactive</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>SMTP Port</td>
+                                        <td>{{ email_settings.smtp_port }}</td>
+                                        <td>
+                                            {% if email_settings.use_tls %}
+                                                <span class="badge bg-info">TLS Enabled</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">TLS Disabled</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>From Name</td>
+                                        <td>{{ email_settings.from_name }}</td>
+                                       <td>
+  <span class="text-muted">
+    {{ email_settings.updated_at | to_ist }}
+  </span>
+</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="ri-mail-line fa-3x text-gray-300 mb-3"></i>
+                            <p class="text-muted">No email settings configured yet.</p>
+                            <a href="{{ url_for('manage_email_settings') }}" class="btn btn-primary">
+                                <i class="ri-mail-line"></i> Configure Email Settings
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Email Notifications Section -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-warning">
+                        <i class="ri-notification-3-line me-2"></i>Email Notifications
+                    </h6>
+                    <a href="{{ url_for('email_notifications_dashboard') }}" class="btn btn-warning btn-sm">
+                        <i class="ri-eye-line"></i> View Logs
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="text-center py-3">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-2">
+                                    <i class="ri-check-line text-success fa-2x"></i>
+                                </div>
+                                <h5 class="text-success mb-0">{{ email_sent_count }}</h5>
+                                <small class="text-muted">Sent</small>
+                            </div>
+                            <div class="col-6">
+                                <div class="mb-2">
+                                    <i class="ri-error-warning-line text-danger fa-2x"></i>
+                                </div>
+                                <h5 class="text-danger mb-0">{{ email_failed_count }}</h5>
+                                <small class="text-muted">Failed</small>
+                            </div>
+                        </div>
+                        <hr>
+                        <p class="text-muted mb-0">
+                            <small>Email notifications will appear here once tickets are created or assigned</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timezone Settings Section -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-info">
+                        <i class="ri-time-line me-2"></i>Timezone Settings
+                    </h6>
+                    <a href="{{ url_for('manage_timezone_settings') }}" class="btn btn-info btn-sm">
+                        <i class="ri-settings-line"></i> Manage
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if timezone_settings %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Setting</th>
+                                        <th>Value</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Timezone</td>
+                                        <td>{{ timezone_settings.timezone_name }}</td>
+                                        <td>
+                                            {% if timezone_settings.is_active %}
+                                                <span class="badge bg-success">Active</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Inactive</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Display Name</td>
+                                        <td>{{ timezone_settings.display_name }}</td>
+                                        <td><span class="text-muted">{{ timezone_settings.utc_offset }}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Last Updated</td>
+                                     <td colspan="2">
+  <span class="text-muted">
+    {{ timezone_settings.updated_at | to_ist }}
+  </span>
+</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="ri-time-line fa-3x text-gray-300 mb-3"></i>
+                            <p class="text-muted">No timezone settings configured yet.</p>
+                            <a href="{{ url_for('manage_timezone_settings') }}" class="btn btn-primary">
+                                <i class="ri-time-line"></i> Configure Timezone Settings
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backup Settings Row -->
+    <div class="row mb-4">
+        <div class="col-lg-12 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-dark">
+                        <i class="ri-database-2-line me-2"></i>Backup Settings
+                    </h6>
+                    <a href="{{ url_for('manage_backup_settings') }}" class="btn btn-dark btn-sm">
+                        <i class="ri-settings-line"></i> Manage
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if backup_settings %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Setting</th>
+                                                <th>Value</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Backup Frequency</td>
+                                                <td><span class="badge bg-primary">{{ backup_settings.backup_frequency.title() }}</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Backup Time</td>
+                                                <td>{{ backup_settings.backup_time.strftime('%H:%M') if backup_settings.backup_time else 'Not set' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Backup Location</td>
+                                                <td><code>{{ backup_settings.backup_location }}</code></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Max Backups</td>
+                                                <td>{{ backup_settings.max_backups }} backups</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Feature</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Compression</td>
+                                                <td>
+                                                    {% if backup_settings.compress_backups %}
+                                                        <span class="badge bg-success">Enabled</span>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary">Disabled</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Include Attachments</td>
+                                                <td>
+                                                    {% if backup_settings.include_attachments %}
+                                                        <span class="badge bg-success">Enabled</span>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary">Disabled</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Email Notifications</td>
+                                                <td>
+                                                    {% if backup_settings.email_notifications %}
+                                                        <span class="badge bg-success">Enabled</span>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary">Disabled</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Overall Status</td>
+                                                <td>
+                                                    {% if backup_settings.is_active %}
+                                                        <span class="badge bg-success">Active</span>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary">Inactive</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="ri-database-2-line fa-3x text-gray-300 mb-3"></i>
+                            <p class="text-muted">No backup settings configured yet.</p>
+                            <a href="{{ url_for('manage_backup_settings') }}" class="btn btn-primary">
+                                <i class="ri-database-2-line"></i> Configure Backup Settings
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+
+.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+
+.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+
+.border-left-secondary {
+    border-left: 0.25rem solid #6c757d !important;
+}
+
+.border-left-dark {
+    border-left: 0.25rem solid #343a40 !important;
+}
+
+.text-gray-800 {
+    color: #5a5c69 !important;
+}
+
+.text-gray-300 {
+    color: #dddfeb !important;
+}
+
+.fa-2x {
+    font-size: 2em;
+}
+
+.fa-3x {
+    font-size: 3em;
+}
+</style>
+{% endblock %}

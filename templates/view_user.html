@@ -1,0 +1,563 @@
+{% extends "base.html" %}
+
+{% block title %}View User - {{ user.full_name }} - GTN Engineering IT Helpdesk{% endblock %}
+
+{% block content %}
+<style>
+    .user-view-container {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+    
+    .view-user-card {
+        background: rgba(255, 255, 255, 0.98);
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        overflow: hidden;
+    }
+    
+    .user-profile-header {
+        background: linear-gradient(45deg, #4facfe, #00f2fe);
+        color: white;
+        padding: 2rem;
+        border-radius: 20px 20px 0 0;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .user-profile-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 100%;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="2" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23dots)"/></svg>');
+        opacity: 0.3;
+    }
+    
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: white;
+        margin: 0 auto 1rem;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        position: relative;
+        z-index: 2;
+    }
+    
+    .status-badge {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 3px solid white;
+    }
+    
+    .status-online {
+        background: #28a745;
+    }
+    
+    .status-offline {
+        background: #6c757d;
+    }
+    
+    .info-card {
+        background: white;
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .info-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-header-custom {
+        background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .info-row {
+        display: flex;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #f8f9fa;
+        transition: background-color 0.3s ease;
+    }
+    
+    .info-row:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #4facfe, #00f2fe);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-size: 1.25rem;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #6c757d;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .info-value {
+        font-size: 1.1rem;
+        color: #333;
+        margin-top: 0.25rem;
+    }
+    
+    .role-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .role-user {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        color: white;
+    }
+    
+    .role-super-admin {
+        background: linear-gradient(45deg, #dc3545, #fd7e14);
+        color: white;
+    }
+    
+    .stats-card {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .stats-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stats-label {
+        font-size: 1rem;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .ticket-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border-bottom: 1px solid #f8f9fa;
+        transition: all 0.3s ease;
+    }
+    
+    .ticket-item:hover {
+        background-color: #f8f9fa;
+        transform: translateX(5px);
+    }
+    
+    .ticket-item:last-child {
+        border-bottom: none;
+    }
+    
+    .ticket-id {
+        background: linear-gradient(45deg, #4facfe, #00f2fe);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        margin-right: 1rem;
+        min-width: 80px;
+        text-align: center;
+    }
+    
+    .priority-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .priority-low { background-color: #d4edda; color: #155724; }
+    .priority-medium { background-color: #fff3cd; color: #856404; }
+    .priority-high { background-color: #f8d7da; color: #721c24; }
+    .priority-critical { background-color: #d1ecf1; color: #0c5460; }
+    
+    .btn-action {
+        border-radius: 25px;
+        padding: 0.8rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 2px solid;
+    }
+    
+    .btn-edit {
+        background: linear-gradient(45deg, #ffc107, #fd7e14);
+        border-color: transparent;
+        color: white;
+    }
+    
+    .btn-edit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 193, 7, 0.3);
+        color: white;
+    }
+    
+    .btn-back {
+        background: transparent;
+        border-color: #6c757d;
+        color: #6c757d;
+    }
+    
+    .btn-back:hover {
+        background: #6c757d;
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .animate-slide-in {
+        animation: slideIn 0.8s ease-out;
+    }
+    
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .no-tickets {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: #6c757d;
+    }
+    
+    .no-tickets i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+</style>
+
+<div class="user-view-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-xl-10">
+                <div class="view-user-card animate-slide-in">
+                    <!-- User Profile Header -->
+                    <div class="user-profile-header">
+                        <div class="text-center">
+                            <div class="profile-avatar">
+                                <i class="ri-user-line"></i>
+                                <div class="status-badge status-{{ 'online' if user.ip_address else 'offline' }}"></div>
+                            </div>
+                            <h1 class="mb-2">{{ user.full_name }}</h1>
+                            <div class="role-badge role-{{ user.role.replace('_', '-') }}">
+                                {{ 'Super Admin' if user.role == 'super_admin' else 'User' }}
+                            </div>
+                            <p class="mt-3 mb-0 opacity-75">{{ user.email }}</p>
+                        </div>
+                        
+                        <div class="d-flex justify-content-center gap-3 mt-4">
+                            <a href="{{ url_for('edit_user', user_id=user.id) }}" class="btn btn-action btn-edit">
+                                <i class="ri-edit-line me-2"></i> Edit User
+                            </a>
+                            <a href="{{ url_for('manage_users') }}" class="btn btn-action btn-back">
+                                <i class="ri-arrow-left-line me-2"></i> Back to Users
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="p-4">
+                        <div class="row">
+                            <!-- User Information -->
+                            <div class="col-lg-6">
+                                <div class="info-card">
+                                    <div class="card-header-custom">
+                                        <i class="ri-information-line me-2"></i>Personal Information
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <div class="info-row">
+                                            <div class="info-icon">
+                                                <i class="ri-user-line"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="info-label">User ID</div>
+                                                <div class="info-value">#{{ user.id }}</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="info-row">
+                                            <div class="info-icon">
+                                                <i class="ri-account-circle-line"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="info-label">Username</div>
+                                                <div class="info-value">{{ user.username }}</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="info-row">
+                                            <div class="info-icon">
+                                                <i class="ri-mail-line"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="info-label">Email Address</div>
+                                                <div class="info-value">
+                                                    <a href="mailto:{{ user.email }}" class="text-decoration-none">{{ user.email }}</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="info-row">
+                                            <div class="info-icon">
+                                                <i class="ri-building-line"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="info-label">Department</div>
+                                                <div class="info-value">{{ user.department or 'Not specified' }}</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="info-row">
+                                            <div class="info-icon">
+                                                <i class="ri-calendar-line"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="info-label">Member Since</div>
+                                                <div class="info-value">{{ user.created_at.strftime('%B %d, %Y') if user.created_at else 'N/A' }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- System Information -->
+                            <div class="col-lg-6">
+                                <div class="info-card">
+                                    <div class="card-header-custom">
+                                        <i class="ri-computer-line me-2"></i>System Information
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <div class="info-row">
+                                            <div class="info-icon">
+                                                <i class="ri-computer-line"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="info-label">System Name</div>
+                                                <div class="info-value">{{ user.system_name or 'Not set' }}</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="info-row">
+                                            <div class="info-icon">
+                                                <i class="ri-global-line"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="info-label">IP Address</div>
+                                                <div class="info-value">{{ user.ip_address or 'N/A' }}</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="info-row">
+                                            <div class="info-icon">
+                                                <i class="ri-shield-user-line"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="info-label">Access Level</div>
+                                                <div class="info-value">
+                                                    <span class="role-badge role-{{ user.role.replace('_', '-') }}">
+                                                        {{ 'Super Admin' if user.role == 'super_admin' else 'User' }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="info-row">
+                                            <div class="info-icon">
+                                                <i class="ri-time-line"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="info-label">Account Status</div>
+                                                <div class="info-value">
+                                                    <span class="badge bg-success">Active</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Statistics -->
+                        <div class="row mt-4">
+                            <div class="col-md-4">
+                                <div class="stats-card">
+                                    <div class="stats-number">{{ user.tickets|length }}</div>
+                                    <div class="stats-label">Total Tickets</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stats-card">
+                                    <div class="stats-number">{{ user.assigned_tickets|length }}</div>
+                                    <div class="stats-label">Assigned Tickets</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stats-card">
+                                    <div class="stats-number">{{ user.comments|length }}</div>
+                                    <div class="stats-label">Comments Made</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Tickets -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="info-card">
+                                    <div class="card-header-custom">
+                                        <i class="ri-ticket-line me-2"></i>Recent Tickets Created
+                                    </div>
+                                    <div class="card-body p-0">
+                                        {% if user.tickets %}
+                                            {% for ticket in user.tickets[:5] %}
+                                            <div class="ticket-item">
+                                                <div class="ticket-id">#{{ ticket.id }}</div>
+                                                <div class="flex-grow-1">
+                                                    <div class="fw-bold mb-1">{{ ticket.title }}</div>
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <span class="priority-badge priority-{{ ticket.priority.lower() }}">
+                                                            {{ ticket.priority }}
+                                                        </span>
+                                                        <small class="text-muted">
+                                                            {{ ticket.created_at.strftime('%b %d, %Y') if ticket.created_at else 'N/A' }}
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <span class="badge bg-{{ 'success' if ticket.status == 'Resolved' else 'primary' if ticket.status == 'In Progress' else 'secondary' }}">
+                                                        {{ ticket.status }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <div class="no-tickets">
+                                                <i class="ri-ticket-line"></i>
+                                                <h5>No Tickets Created</h5>
+                                                <p class="text-muted mb-0">This user hasn't created any support tickets yet.</p>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if user.assigned_tickets %}
+                        <!-- Assigned Tickets -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="info-card">
+                                    <div class="card-header-custom">
+                                        <i class="ri-user-settings-line me-2"></i>Tickets Assigned to User
+                                    </div>
+                                    <div class="card-body p-0">
+                                        {% for ticket in user.assigned_tickets[:5] %}
+                                        <div class="ticket-item">
+                                            <div class="ticket-id">#{{ ticket.id }}</div>
+                                            <div class="flex-grow-1">
+                                                <div class="fw-bold mb-1">{{ ticket.title }}</div>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <span class="priority-badge priority-{{ ticket.priority.lower() }}">
+                                                        {{ ticket.priority }}
+                                                    </span>
+                                                    <small class="text-muted">
+                                                        Assigned {{ ticket.created_at.strftime('%b %d, %Y') if ticket.created_at else 'N/A' }}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <span class="badge bg-{{ 'success' if ticket.status == 'Resolved' else 'primary' if ticket.status == 'In Progress' else 'secondary' }}">
+                                                    {{ ticket.status }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add smooth scrolling for ticket items
+    const ticketItems = document.querySelectorAll('.ticket-item');
+    ticketItems.forEach((item, index) => {
+        item.style.animationDelay = `${index * 0.1}s`;
+        item.classList.add('animate-slide-in');
+    });
+    
+    // Add hover effects for info cards
+    const infoCards = document.querySelectorAll('.info-card');
+    infoCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+</script>
+{% endblock %}

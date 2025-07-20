@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Ticket #{{ ticket.ticket_number }} - GTN Engineering IT Helpdesk{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2><i class="ri-edit-line"></i> Edit Ticket #{{ ticket.ticket_number }}</h2>
+                        <p class="text-muted">Modify ticket details and status</p>
+                    </div>
+                    <a href="{{ url_for('super_admin_dashboard') }}" class="btn btn-outline-secondary">
+                        <i class="ri-arrow-left-line"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="ri-file-edit-line"></i> Ticket Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST">
+                            {{ form.hidden_tag() }}
+                            
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="mb-3">
+                                        {{ form.title.label(class="form-label") }}
+                                        {{ form.title(class="form-control") }}
+                                        {% if form.title.errors %}
+                                            <div class="text-danger small">
+                                                {% for error in form.title.errors %}
+                                                    <div>{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        {{ form.status.label(class="form-label") }}
+                                        {{ form.status(class="form-select") }}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                {{ form.description.label(class="form-label") }}
+                                {{ form.description(class="form-control", rows="4") }}
+                                {% if form.description.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.description.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        {{ form.category.label(class="form-label") }}
+                                        {{ form.category(class="form-select") }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        {{ form.priority.label(class="form-label") }}
+                                        {{ form.priority(class="form-select") }}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="{{ url_for('super_admin_dashboard') }}" class="btn btn-secondary">
+                                    <i class="ri-close-line"></i> Cancel
+                                </a>
+                                {{ form.submit(class="btn btn-primary") }}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="ri-information-line"></i> Ticket Details
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <strong>Submitted by:</strong><br>
+                            {{ ticket.user_name }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Department:</strong><br>
+                            {{ ticket.user.department }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>IP Address:</strong><br>
+                            <code>{{ ticket.user_ip_address or 'Not captured' }}</code>
+                        </div>
+                        <div class="mb-3">
+                            <strong>System Name:</strong><br>
+                            <code>{{ ticket.user_system_name or 'Not captured' }}</code>
+                        </div>
+                        <div class="mb-3">
+    <strong>Created:</strong><br>
+    {{ ticket.created_at|to_ist }}
+</div>
+                        {% if ticket.assigned_to %}
+                            <div class="mb-3">
+                                <strong>Assigned to:</strong><br>
+                                {{ ticket.assignee.full_name }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0 text-gray-800">
+                        <i class="ri-pulse-line me-2"></i>Manage Statuses
+                    </h1>
+                    <p class="text-muted">Add and manage ticket statuses</p>
+                </div>
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('master_data_dashboard') }}" class="btn btn-outline-secondary">
+                        <i class="ri-arrow-left-line"></i> Back to Master Data
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Add New Status Form -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-info">
+                        <i class="ri-add-line me-2"></i>Add New Status
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="form-group mb-3">
+                            {{ form.name.label(class="form-label") }}
+                            {{ form.name(class="form-control") }}
+                            {% if form.name.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.name.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            {{ form.color_code.label(class="form-label") }}
+                            {{ form.color_code(class="form-control", type="color") }}
+                            {% if form.color_code.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.color_code.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            {{ form.description.label(class="form-label") }}
+                            {{ form.description(class="form-control", rows="3") }}
+                            {% if form.description.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.description.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-check mb-3">
+                            {{ form.is_active(class="form-check-input") }}
+                            {{ form.is_active.label(class="form-check-label") }}
+                        </div>
+
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-info") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Existing Statuses -->
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-info">
+                        <i class="ri-list-check-3"></i> Existing Statuses
+                    </h6>
+                    <span class="badge bg-info">{{ statuses|length }} Total</span>
+                </div>
+                <div class="card-body">
+                    {% if statuses %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Color</th>
+                                        <th>Description</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                        <th>Updated</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for status in statuses %}
+                                    <tr>
+                                        <td><strong>{{ status.name }}</strong></td>
+                                        <td>
+                                            {% if status.color_code %}
+                                                <span class="badge" style="background-color: {{ status.color_code }}; color: white;">
+                                                    {{ status.color_code }}
+                                                </span>
+                                            {% else %}
+                                                <span class="text-muted">No color</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ status.description or 'No description' }}</td>
+                                        <td>
+                                            {% if status.is_active %}
+                                                <span class="badge bg-success">
+                                                    <i class="ri-check-line"></i> Active
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">
+                                                    <i class="ri-close-line"></i> Inactive
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                           <small class="text-muted">
+    {{ status.created_at | to_ist }}
+</small>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">
+    {{ status.updated_at | to_ist }}
+</small>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a href="{{ url_for('edit_status', status_id=status.id) }}" 
+                                                   class="btn btn-outline-primary btn-sm" 
+                                                   title="Edit Status">
+                                                    <i class="ri-edit-line"></i>
+                                                </a>
+                                                {% if status.is_active %}
+                                                    <button type="button" 
+                                                            class="btn btn-outline-warning btn-sm" 
+                                                            title="Deactivate Status"
+                                                            onclick="confirmAction('Are you sure you want to deactivate this status?')">
+                                                        <i class="ri-pause-line"></i>
+                                                    </button>
+                                                {% else %}
+                                                    <button type="button" 
+                                                            class="btn btn-outline-success btn-sm" 
+                                                            title="Activate Status"
+                                                            onclick="confirmAction('Are you sure you want to activate this status?')">
+                                                        <i class="ri-play-line"></i>
+                                                    </button>
+                                                {% endif %}
+                                                <button type="button" 
+                                                        class="btn btn-outline-danger btn-sm" 
+                                                        title="Delete Status"
+                                                        onclick="confirmDelete('{{ status.name }}', '{{ url_for('delete_status', status_id=status.id) }}')">
+                                                    <i class="ri-delete-bin-line"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="ri-pulse-line fa-3x text-gray-300 mb-3"></i>
+                            <h5 class="text-muted">No Statuses Found</h5>
+                            <p class="text-muted">Start by creating your first status using the form on the left.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.text-gray-800 {
+    color: #5a5c69 !important;
+}
+
+.text-gray-300 {
+    color: #dddfeb !important;
+}
+
+.fa-3x {
+    font-size: 3em;
+}
+</style>
+{% endblock %}

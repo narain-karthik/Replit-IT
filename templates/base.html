@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% block description %}GTN Engineering IT Helpdesk{% endblock %}">
+    <title>{% block title %}GTN Engineering IT Helpdesk{% endblock %}</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Remix Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <!-- Source Code Protection -->
+    <style>
+        /* Disable text selection on sensitive elements */
+        .no-select {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Hide scrollbars to prevent easy inspection */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        /* Prevent highlighting of code-like elements */
+        pre, code, script, style {
+            -webkit-user-select: none !important;
+            -moz-user-select: none !important;
+            -ms-user-select: none !important;
+            user-select: none !important;
+        }
+
+        /* Security overlay */
+        .security-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 24px;
+            text-align: center;
+        }
+    </style>
+
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <!-- Security Overlay -->
+    <div id="securityOverlay" class="security-overlay">
+        <div>
+            <h2>⚠️ Access Restricted</h2>
+            <p>This action is not permitted for security reasons.</p>
+            <button onclick="closeSecurityOverlay()" class="btn btn-light mt-3">Continue</button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header no-select">
+        <div class="header-content">
+            <div class="logo-container">
+                <div class="logo-placeholder">
+                    <img src="{{ url_for('static', filename='gtn_logo.jpg') }}" alt="GTN Engineering" style="height: 60px; width: auto;" draggable="false">
+                </div>
+                <div class="company-text">
+                    <h1>GTN Engineering (India) Ltd</h1>
+                    <h2><strong>IT HELPDESK</strong></h2>
+
+                </div>
+            </div>
+            <nav class="menu">
+                {% if session.user_id %}
+                    {% if session.role == 'super_admin' %}
+                        <a href="{{ url_for('super_admin_dashboard') }}"><i class="ri-dashboard-line"></i> Dashboard</a>
+                        <a href="{{ url_for('manage_users') }}"><i class="ri-team-line"></i> Users</a>
+                        <a href="{{ url_for('reports_dashboard') }}"><i class="ri-bar-chart-line"></i> Reports</a>
+                        <a href="{{ url_for('master_data_dashboard') }}"><i class="ri-database-2-line"></i> Master Data</a>
+                        <a href="{{ url_for('logout') }}"><i class="ri-logout-box-line"></i> Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('user_dashboard') }}"><i class="ri-dashboard-line"></i> My Tickets</a>
+                        <a href="{{ url_for('create_ticket') }}"><i class="ri-add-line"></i> New Ticket</a>
+                   <!--     <a href="{{ url_for('user_profile') }}"><i class="ri-user-settings-line"></i> Profile</a> -->
+                        <a href="{{ url_for('logout') }}"><i class="ri-logout-box-line"></i> Logout</a>
+                    {% endif %}
+                {% else %}
+                    <a href="{{ url_for('user_login') }}"><i class="ri-user-line"></i> User Login</a>
+
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="container mt-3">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="{% block main_class %}main-content{% endblock %}">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 GTN Engineering (India) Ltd - IT TEAM.</p>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+    <!-- Master Data JavaScript Functions -->
+    <script>
+        function confirmDelete(itemName, deleteUrl) {
+            if (confirm(`Are you sure you want to delete "${itemName}"? This action cannot be undone.`)) {
+                // Create a form and submit it as POST request
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = deleteUrl;
+
+                // Add CSRF token if available
+                const csrfToken = document.querySelector('meta[name=csrf-token]');
+                if (csrfToken) {
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = 'csrf_token';
+                    csrfInput.value = csrfToken.getAttribute('content');
+                    form.appendChild(csrfInput);
+                }
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        function confirmAction(message) {
+            return confirm(message);
+        }
+    </script>
+
+    <!-- Additional Security Script -->
+    <script>
+        // Security overlay functions
+        function showSecurityOverlay() {
+            document.getElementById('securityOverlay').style.display = 'flex';
+        }
+
+        function closeSecurityOverlay() {
+            document.getElementById('securityOverlay').style.display = 'none';
+        }
+
+        // Additional protection measures
+        document.addEventListener('DOMContentLoaded', function() {
+            // Disable drag on all images
+            const images = document.querySelectorAll('img');
+            images.forEach(function(img) {
+                img.draggable = false;
+                img.addEventListener('dragstart', function(e) {
+                    e.preventDefault();
+                    return false;
+                });
+            });
+
+            // Monitor for suspicious activity
+            let suspiciousActivity = 0;
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+                    suspiciousActivity++;
+                    if (suspiciousActivity > 3) {
+                        showSecurityOverlay();
+                    }
+                }
+            });
+
+            // Disable print screen
+            document.addEventListener('keyup', function(e) {
+                if (e.key === 'PrintScreen') {
+                    navigator.clipboard.writeText('');
+                    if (typeof GTNHelpdesk !== 'undefined' && GTNHelpdesk.showNotification) {
+                        GTNHelpdesk.showNotification('Screenshot blocked for security', 'warning');
+                    }
+                }
+            });
+        });
+
+        // Obfuscate source in console
+        setTimeout(function() {
+            if (typeof console !== 'undefined') {
+                console.log('%cSTOP!', 'color: red; font-size: 50px; font-weight: bold;');
+                console.log('%cThis is a browser feature intended for developers. If someone told you to copy-paste something here, it is a scam and will give them access to your account.', 'color: red; font-size: 16px;');
+            }
+        }, 2000);
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

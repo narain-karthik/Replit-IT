@@ -1,0 +1,798 @@
+{% extends "base.html" %}
+
+{% block title %}Create Ticket - GTN Engineering IT Helpdesk{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10 col-xl-8">
+            <!-- Page Header -->
+            <div class="page-header mb-4">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h1 class="page-title">
+                            <i class="ri-ticket-line text-primary"></i>
+                            Create Support Ticket
+                        </h1>
+                        <p class="page-subtitle">Need help? Submit a support ticket and our team will assist you.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Steps -->
+            <div class="ticket-progress mb-4">
+                <div class="progress-step active">
+                    <div class="step-icon">
+                        <i class="ri-edit-line"></i>
+                    </div>
+                    <span class="step-text">Ticket Details</span>
+                </div>
+                <div class="progress-step">
+                    <div class="step-icon">
+                        <i class="ri-attachment-line"></i>
+                    </div>
+                    <span class="step-text">Attachments</span>
+                </div>
+                <div class="progress-step">
+                    <div class="step-icon">
+                        <i class="ri-send-plane-line"></i>
+                    </div>
+                    <span class="step-text">Submit</span>
+                </div>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data" id="ticketForm">
+                {{ form.hidden_tag() }}
+
+                <!-- Main Ticket Form Card -->
+                <div class="card ticket-form-card">
+                    <div class="card-body p-4">
+                        <!-- Title Section -->
+                        <div class="form-section mb-4">
+                            <h5 class="section-title">
+                                <i class="ri-text text-primary"></i>
+                                Ticket Information
+                            </h5>
+                            <div class="mb-3">
+                                <label class="form-label required">{{ form.title.label.text }}</label>
+                                {{ form.title(class="form-control form-control-lg" + (" is-invalid" if form.title.errors else ""), placeholder="Brief description of your issue") }}
+                                {% if form.title.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.title.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">
+                                    <i class="ri-information-line"></i>
+                                    Be specific and descriptive. Good example: "Printer not working in Conference Room A"
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Category and Priority Section -->
+                        <div class="form-section mb-4">
+                            <h5 class="section-title">
+                                <i class="ri-settings-line text-primary"></i>
+                                Classification
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label required">{{ form.category.label.text }}</label>
+                                        {{ form.category(class="form-select form-select-lg" + (" is-invalid" if form.category.errors else "")) }}
+                                        {% if form.category.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.category.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                        <div class="form-text">
+                                            <i class="ri-information-line"></i>
+                                            Choose the category that best describes your issue
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label required">{{ form.priority.label.text }}</label>
+                                        {{ form.priority(class="form-select form-select-lg" + (" is-invalid" if form.priority.errors else "")) }}
+                                        {% if form.priority.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.priority.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                        <div class="form-text">
+                                            <i class="ri-information-line"></i>
+                                            How urgent is this issue?
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- System Information Section -->
+                        <div class="form-section mb-4">
+                            <h5 class="section-title">
+                                <i class="ri-computer-line text-primary"></i>
+                                System Information
+                            </h5>
+                            <div class="mb-3">
+                                <label class="form-label">{{ form.system_name.label.text }}</label>
+                                <div class="input-group">
+                                    {{ form.system_name(class="form-control" + (" is-invalid" if form.system_name.errors else ""), placeholder="e.g., DESKTOP-ABC123, Laptop-001", id="system_name_field") }}
+                                    <button type="button" class="btn btn-outline-secondary" onclick="detectSystemName()" title="Auto-detect system name">
+                                        <i class="ri-computer-line"></i>
+                                    </button>
+                                </div>
+                                {% if form.system_name.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.system_name.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">
+                                    <i class="ri-information-line"></i>
+                                    Enter your computer name or click the button to auto-detect (helpful for IT support)
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Description Section -->
+                        <div class="form-section mb-4">
+                            <h5 class="section-title">
+                                <i class="ri-file-text-line text-primary"></i>
+                                Detailed Description
+                            </h5>
+                            <div class="mb-3">
+                                <label class="form-label required">{{ form.description.label.text }}</label>
+                                {{ form.description(class="form-control description-textarea" + (" is-invalid" if form.description.errors else ""),
+                                    placeholder="Please provide a detailed description of the issue:\n\n• What were you trying to do?\n• What happened instead?\n• When did this start?\n• Have you tried any solutions?\n• Error messages (if any)",
+                                    rows="8") }}
+                                {% if form.description.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.description.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">
+                                    <i class="ri-information-line"></i>
+                                    The more details you provide, the faster we can help you
+                                </div>
+                                <div class="character-counter">
+                                    <span class="counter-text">0 characters</span>
+                                    <span class="counter-min">Minimum 10 characters</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- File Upload Section -->
+                        <div class="form-section mb-4">
+                            <h5 class="section-title">
+                                <i class="ri-attachment-line text-primary"></i>
+                                Attachments
+                                <span class="optional-tag">Optional</span>
+                            </h5>
+                            <div class="upload-area" id="uploadArea">
+                                <div class="upload-content" id="uploadContent">
+                                    <i class="ri-upload-cloud-line upload-icon"></i>
+                                    <h6>Upload multiple files to help us understand the issue</h6>
+                                    <p class="text-muted">Screenshots, error messages, or related documents (Hold Ctrl/Cmd to select multiple files)</p>
+                                    {{ form.image(class="form-control file-input" + (" is-invalid" if form.image.errors else ""),
+                                        accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx", multiple=True, id="fileInput") }}
+                                    {% if form.image.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.image.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="upload-info">
+                                    <small class="text-muted">
+                                        <i class="ri-information-line"></i>
+                                        Supported formats: Images (JPG, PNG, GIF), Documents (PDF, Word, Excel) • Max size: 10MB per file
+                                    </small>
+                                </div>
+                                <!-- Selected files display -->
+                                <div id="selectedFiles" class="selected-files mt-3" style="display: none;">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="text-primary mb-0"><i class="ri-file-list-line"></i> Selected Files:</h6>
+                                        <button type="button" id="clearAllFiles" class="btn btn-sm btn-outline-danger">
+                                            <i class="ri-delete-bin-line"></i> Clear All
+                                        </button>
+                                    </div>
+                                    <div id="filesList" class="files-list"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Section -->
+                        <div class="form-section">
+                            <div class="submit-section">
+                                <div class="row align-items-center">
+                                    <div class="col-md-6">
+                                        <div class="submission-info">
+                                            <h6><i class="ri-time-line text-primary"></i> What happens next?</h6>
+                                            <ul class="next-steps">
+                                                <li>You'll receive a ticket number for reference</li>
+                                                <li>Our team will review your request</li>
+                                                <li>You'll get updates via email and dashboard</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 text-md-end">
+                                        <div class="button-group">
+                                            <a href="{{ url_for('user_dashboard') }}" class="btn btn-outline-secondary btn-lg me-2">
+                                                <i class="ri-arrow-left-line"></i>
+                                                Cancel
+                                            </a>
+                                            {{ form.submit(class="btn btn-primary btn-lg") }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Create Ticket Specific Styles */
+.page-header {
+    padding: 2rem 0 1rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.page-subtitle {
+    color: #6c757d;
+    font-size: 1.1rem;
+    margin-bottom: 0;
+}
+
+.ticket-progress {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 10px;
+}
+
+.progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.progress-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 100%;
+    width: 30px;
+    height: 2px;
+    background: #dee2e6;
+    z-index: 0;
+}
+
+.progress-step.active .step-icon {
+    background: #007bff;
+    color: white;
+    transform: scale(1.1);
+}
+
+.progress-step.active .step-text {
+    color: #007bff;
+    font-weight: 600;
+}
+
+.step-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #dee2e6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.step-text {
+    font-size: 0.9rem;
+    color: #6c757d;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.ticket-form-card {
+    border: none;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border-radius: 12px;
+}
+
+.form-section {
+    padding: 1.5rem 0;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.form-section:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.section-title {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-title i {
+    font-size: 1.2rem;
+}
+
+.optional-tag {
+    background: #e9ecef;
+    color: #6c757d;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    margin-left: auto;
+}
+
+.form-label.required::after {
+    content: ' *';
+    color: #dc3545;
+}
+
+.form-control-lg, .form-select-lg {
+    padding: 0.75rem 1rem;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.description-textarea {
+    min-height: 120px;
+    resize: vertical;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+.character-counter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.counter-text {
+    color: #6c757d;
+}
+
+.counter-min {
+    color: #dc3545;
+    font-weight: 500;
+}
+
+.upload-area {
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.upload-area:hover {
+    border-color: #007bff;
+    background: #f8f9ff;
+}
+
+.upload-content {
+    position: relative;
+    z-index: 2;
+}
+
+.upload-icon {
+    font-size: 3rem;
+    color: #007bff;
+    margin-bottom: 1rem;
+}
+
+.upload-content h6 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 3;
+}
+
+.upload-info {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.selected-files {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.files-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.file-item {
+    border: 1px solid #dee2e6;
+    transition: all 0.2s ease;
+}
+
+.file-item:hover {
+    border-color: #007bff;
+    background: #f8f9ff !important;
+}
+
+.file-name {
+    font-weight: 500;
+    color: #2c3e50;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.remove-file {
+    transition: all 0.2s ease;
+}
+
+.remove-file:hover {
+    background: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.submission-info h6 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+}
+
+.next-steps {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.next-steps li {
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.next-steps li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #28a745;
+    font-weight: bold;
+}
+
+.submit-section {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+.button-group {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.btn-lg {
+    padding: 0.75rem 2rem;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .ticket-progress {
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .progress-step:not(:last-child)::after {
+        width: 20px;
+    }
+
+    .step-text {
+        font-size: 0.8rem;
+    }
+
+    .button-group {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .btn-lg {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    .submit-section .row {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+</style>
+
+<script>
+// Function to detect system name
+function detectSystemName() {
+    const systemNameField = document.getElementById('system_name_field');
+    const button = event.target.closest('button');
+
+    // Show loading state
+    const originalIcon = button.innerHTML;
+    button.innerHTML = '<i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i>';
+    button.disabled = true;
+
+    // Try to get hostname from browser APIs
+    try {
+        // Try WebRTC method for hostname detection
+        const rtc = new RTCPeerConnection({iceServers: []});
+        rtc.createDataChannel('');
+        rtc.createOffer().then(offer => rtc.setLocalDescription(offer));
+
+        rtc.onicecandidate = function(event) {
+            if (event.candidate) {
+                const candidate = event.candidate.candidate;
+                const hostMatch = candidate.match(/candidate:\d+ \d+ \w+ \d+ ([^\s]+)/);
+                if (hostMatch && hostMatch[1] && !hostMatch[1].includes('.')) {
+                    // Found hostname
+                    systemNameField.value = hostMatch[1].toUpperCase();
+                    button.innerHTML = '<i class="ri-check-line" style="color: green;"></i>';
+                    setTimeout(() => {
+                        button.innerHTML = originalIcon;
+                        button.disabled = false;
+                    }, 2000);
+                    rtc.close();
+                    return;
+                }
+            }
+        };
+
+        // Fallback after timeout
+        setTimeout(() => {
+            if (button.disabled) {
+                // Use more specific system detection
+                const userAgent = navigator.userAgent;
+                let systemName = 'Unknown-System';
+
+                if (userAgent.includes('Windows NT 10.0')) {
+                    systemName = 'Windows-10-PC';
+                } else if (userAgent.includes('Windows NT 6.3')) {
+                    systemName = 'Windows-8-PC';
+                } else if (userAgent.includes('Windows')) {
+                    systemName = 'Windows-PC';
+                } else if (userAgent.includes('Mac OS X')) {
+                    systemName = 'MacOS-System';
+                } else if (userAgent.includes('Linux')) {
+                    systemName = 'Linux-System';
+                }
+
+                // Add timestamp for uniqueness
+                const timestamp = new Date().toISOString().slice(11, 19).replace(/:/g, '');
+                systemName += '-' + timestamp;
+
+                systemNameField.value = systemName;
+                systemNameField.placeholder = 'Please update with your actual computer name';
+                button.innerHTML = '<i class="ri-information-line" style="color: orange;"></i>';
+                setTimeout(() => {
+                    button.innerHTML = originalIcon;
+                    button.disabled = false;
+                }, 2000);
+            }
+        }, 3000);
+
+    } catch (error) {
+        // Complete fallback
+        systemNameField.value = 'PC-' + new Date().getTime().toString().slice(-6);
+        systemNameField.placeholder = 'Please update with your actual computer name';
+        button.innerHTML = '<i class="ri-error-warning-line" style="color: red;"></i>';
+        setTimeout(() => {
+            button.innerHTML = originalIcon;
+            button.disabled = false;
+        }, 2000);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Character counter for description
+    const descriptionField = document.querySelector('.description-textarea');
+    const counterText = document.querySelector('.counter-text');
+    const counterMin = document.querySelector('.counter-min');
+
+    if (descriptionField && counterText) {
+        function updateCounter() {
+            const length = descriptionField.value.length;
+            counterText.textContent = length + ' characters';
+
+            if (length >= 10) {
+                counterMin.style.color = '#28a745';
+                counterMin.textContent = 'Minimum requirement met ✓';
+            } else {
+                counterMin.style.color = '#dc3545';
+                counterMin.textContent = 'Minimum 10 characters';
+            }
+        }
+
+        descriptionField.addEventListener('input', updateCounter);
+        updateCounter(); // Initial call
+    }
+
+    // File upload enhancement with proper event delegation
+    const uploadArea = document.getElementById('uploadArea');
+    const uploadContent = document.getElementById('uploadContent');
+    const selectedFilesDiv = document.getElementById('selectedFiles');
+    const filesList = document.getElementById('filesList');
+    let selectedFiles = [];
+
+    function getFileIcon(filename) {
+        const extension = filename.split('.').pop().toLowerCase();
+        if (['jpg', 'jpeg', 'png', 'gif', 'bmp'].includes(extension)) {
+            return { icon: 'ri-image-line', color: '#17a2b8' };
+        } else if (extension === 'pdf') {
+            return { icon: 'ri-file-pdf-line', color: '#dc3545' };
+        } else if (['doc', 'docx'].includes(extension)) {
+            return { icon: 'ri-file-word-line', color: '#007bff' };
+        } else if (['xls', 'xlsx'].includes(extension)) {
+            return { icon: 'ri-file-excel-line', color: '#28a745' };
+        }
+        return { icon: 'ri-file-line', color: '#6c757d' };
+    }
+
+    function updateFileInput() {
+        const dt = new DataTransfer();
+        selectedFiles.forEach(file => dt.items.add(file));
+        
+        const currentInput = document.getElementById('fileInput');
+        if (currentInput) {
+            currentInput.files = dt.files;
+        }
+    }
+
+    function renderFileDisplay() {
+        if (selectedFiles.length > 0) {
+            // Update upload area appearance
+            const fileText = selectedFiles.length === 1 ? 'File' : 'Files';
+            uploadContent.innerHTML = `
+                <i class="ri-file-check-line upload-icon" style="color: #28a745;"></i>
+                <h6>${selectedFiles.length} ${fileText} Selected</h6>
+                <p class="text-muted">Click here to select different files</p>
+                <input type="file" class="form-control file-input" name="image" accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx" multiple id="fileInput">
+            `;
+            uploadArea.style.borderColor = '#28a745';
+            uploadArea.style.background = '#f8fff8';
+
+            // Show selected files list
+            selectedFilesDiv.style.display = 'block';
+            filesList.innerHTML = '';
+            
+            selectedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item d-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded';
+                
+                const {icon, color} = getFileIcon(file.name);
+                
+                fileItem.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <i class="${icon}" style="color: ${color}; font-size: 1.2rem; margin-right: 0.5rem;"></i>
+                        <div>
+                            <div class="file-name">${file.name}</div>
+                            <small class="text-muted">${(file.size / 1024 / 1024).toFixed(2)} MB</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-file" data-index="${index}">
+                        <i class="ri-close-line"></i>
+                    </button>
+                `;
+                
+                filesList.appendChild(fileItem);
+            });
+
+            updateFileInput();
+        } else {
+            // Reset to initial state
+            uploadContent.innerHTML = `
+                <i class="ri-upload-cloud-line upload-icon"></i>
+                <h6>Upload multiple files to help us understand the issue</h6>
+                <p class="text-muted">Screenshots, error messages, or related documents (Hold Ctrl/Cmd to select multiple files)</p>
+                <input type="file" class="form-control file-input" name="image" accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx" multiple id="fileInput">
+            `;
+            uploadArea.style.borderColor = '#dee2e6';
+            uploadArea.style.background = '';
+            selectedFilesDiv.style.display = 'none';
+        }
+    }
+
+    // Use event delegation for file input changes
+    document.addEventListener('change', function(e) {
+        if (e.target.id === 'fileInput') {
+            selectedFiles = Array.from(e.target.files);
+            renderFileDisplay();
+        }
+    });
+
+    // Use event delegation for remove file buttons
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-file')) {
+            e.preventDefault();
+            const button = e.target.closest('.remove-file');
+            const index = parseInt(button.dataset.index);
+            selectedFiles.splice(index, 1);
+            renderFileDisplay();
+        }
+    });
+
+    // Use event delegation for clear all button
+    document.addEventListener('click', function(e) {
+        if (e.target.id === 'clearAllFiles' || e.target.closest('#clearAllFiles')) {
+            e.preventDefault();
+            selectedFiles = [];
+            renderFileDisplay();
+        }
+    });
+
+    // Form validation enhancement
+    const form = document.getElementById('ticketForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.innerHTML = '<i class="ri-loader-line spin"></i> Creating Ticket...';
+                submitBtn.disabled = true;
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

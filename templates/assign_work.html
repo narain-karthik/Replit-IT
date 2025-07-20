@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Assign Work - GTN Engineering IT Helpdesk{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="ri-user-add-line"></i> Assign Work to Admin</h4>
+                    </div>
+                    <div class="card-body">
+                        <!-- Ticket Information -->
+                        <div class="alert alert-info">
+                            <h6><i class="ri-ticket-line"></i> Ticket Details</h6>
+                            <p><strong>Ticket #:</strong> {{ ticket.ticket_number }}</p>
+                            <p><strong>Title:</strong> {{ ticket.title }}</p>
+                            <p><strong>Category:</strong> 
+                                <span class="badge bg-secondary">{{ ticket.category }}</span>
+                            </p>
+                            <p><strong>Priority:</strong> 
+                                {% set priority_class = {
+                                    'Low': 'success',
+                                    'Medium': 'warning',
+                                    'High': 'danger',
+                                    'Critical': 'dark'
+                                } %}
+                                <span class="badge bg-{{ priority_class[ticket.priority] }}">
+                                    {{ ticket.priority }}
+                                </span>
+                            </p>
+                            <p><strong>Submitted by:</strong> {{ ticket.user.full_name }} ({{ ticket.user.department }})</p>
+                        </div>
+
+                        <form method="POST">
+                            {{ form.hidden_tag() }}
+                            
+                            <div class="mb-3">
+                                {{ form.assigned_to.label(class="form-label") }}
+                                {{ form.assigned_to(class="form-select" + (" is-invalid" if form.assigned_to.errors else "")) }}
+                                {% if form.assigned_to.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.assigned_to.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between">
+                                <a href="{{ url_for('super_admin_dashboard') }}" class="btn btn-secondary">
+                                    <i class="ri-arrow-left-line"></i> Back to Dashboard
+                                </a>
+                                {{ form.submit(class="btn btn-primary") }}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Available Admins Information -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h6><i class="ri-team-line"></i> Available Admins for {{ ticket.category }}</h6>
+                    </div>
+                    <div class="card-body">
+                        {% if admins %}
+                            <div class="row">
+                                {% for admin in admins %}
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">{{ admin.full_name }}</h6>
+                                                <p class="card-text">
+                                                    <strong>Department:</strong> {{ admin.department }}<br>
+                                                    <strong>Email:</strong> {{ admin.email }}<br>
+                                                    <strong>Specialization:</strong> {{ ticket.category }} Support
+                                                </p>
+                                                <!-- You could add workload or availability info here -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-warning">
+                                Please assign to a general admin or create specialized admin accounts.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

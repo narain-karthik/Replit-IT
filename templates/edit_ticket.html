@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Ticket {{ ticket.ticket_number }} - GTN Engineering IT Helpdesk{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="ri-edit-line"></i> Edit Ticket {{ ticket.ticket_number }}</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST">
+                            {{ form.hidden_tag() }}
+                            
+                            <div class="alert alert-info">
+                                <i class="ri-information-line"></i> You can only update the ticket status. Other ticket details cannot be modified after creation.
+                            </div>
+                            
+                            <!-- Display current ticket details (read-only) -->
+                            <div class="mb-3">
+                                <label class="form-label">Title</label>
+                                <input type="text" class="form-control" value="{{ ticket.title }}" readonly>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Category</label>
+                                        <input type="text" class="form-control" value="{{ ticket.category }}" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Priority</label>
+                                        <input type="text" class="form-control" value="{{ ticket.priority }}" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        {{ form.status.label(class="form-label") }}
+                                        {{ form.status(class="form-select" + (" is-invalid" if form.status.errors else "")) }}
+                                        {% if form.status.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.status.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" rows="6" readonly>{{ ticket.description }}</textarea>
+                            </div>
+                            
+                            <!-- Comment section for Super Admin -->
+                            {% if user and user.role == 'super_admin' %}
+                                <div class="mb-3">
+                                    <label for="admin_comment" class="form-label">Add Comment (Super Admin)</label>
+                                    <textarea name="admin_comment" id="admin_comment" class="form-control" rows="3" 
+                                              placeholder="Add a comment about this status update..."></textarea>
+                                </div>
+                            {% endif %}
+                            
+                            <div class="d-flex justify-content-between">
+                                <a href="{{ url_for('view_ticket', ticket_id=ticket.id) }}" class="btn btn-secondary">
+                                    <i class="ri-arrow-left-line"></i> Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="ri-refresh-line"></i> Update Status
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Ticket Info -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h6><i class="ri-information-line"></i> Ticket Information</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Submitted by:</strong> {{ ticket.user.full_name }}</p>
+                                <p><strong>Department:</strong> {{ ticket.user.department }}</p>
+                                <p><strong>Created:</strong> {{ ticket.created_at|to_ist }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                {% if ticket.assignee %}
+                                    <p><strong>Assigned to:</strong> {{ ticket.assignee.full_name }}</p>
+                                {% endif %}
+                                <p><strong>Last updated:</strong> {{ ticket.updated_at|to_ist }}</p>
+                                {% if ticket.resolved_at %}
+                                   <p><strong>Resolved:</strong> {{ ticket.resolved_at|to_ist }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

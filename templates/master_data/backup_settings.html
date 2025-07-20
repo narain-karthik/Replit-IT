@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0 text-gray-800">
+                        <i class="ri-database-2-line me-2"></i>Backup Settings
+                    </h1>
+                    <p class="text-muted">Configure automatic database backup preferences</p>
+                </div>
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('master_data_dashboard') }}" class="btn btn-outline-secondary">
+                        <i class="ri-arrow-left-line"></i> Back to Master Data
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Backup Configuration</h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.backup_frequency.label(class="form-label") }}
+                                    {{ form.backup_frequency(class="form-select") }}
+                                    {% if form.backup_frequency.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.backup_frequency.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.backup_time.label(class="form-label") }}
+                                    {{ form.backup_time(class="form-control") }}
+                                    {% if form.backup_time.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.backup_time.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.backup_location.label(class="form-label") }}
+                                    {{ form.backup_location(class="form-control") }}
+                                    {% if form.backup_location.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.backup_location.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.max_backups.label(class="form-label") }}
+                                    {{ form.max_backups(class="form-control") }}
+                                    {% if form.max_backups.errors %}
+                                        <div class="text-danger small">
+                                            {% for error in form.max_backups.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.notification_email.label(class="form-label") }}
+                            {{ form.notification_email(class="form-control") }}
+                            {% if form.notification_email.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.notification_email.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <hr>
+                        <h6 class="text-secondary mb-3">Backup Options</h6>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3 form-check">
+                                    {{ form.compress_backups(class="form-check-input") }}
+                                    {{ form.compress_backups.label(class="form-check-label") }}
+                                </div>
+                                <div class="mb-3 form-check">
+                                    {{ form.include_attachments(class="form-check-input") }}
+                                    {{ form.include_attachments.label(class="form-check-label") }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3 form-check">
+                                    {{ form.email_notifications(class="form-check-input") }}
+                                    {{ form.email_notifications.label(class="form-check-label") }}
+                                </div>
+                                <div class="mb-3 form-check">
+                                    {{ form.is_active(class="form-check-input") }}
+                                    {{ form.is_active.label(class="form-check-label") }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-info">Current Settings</h6>
+                </div>
+                <div class="card-body">
+                    {% if backup_settings %}
+                        <p><strong>Frequency:</strong> {{ backup_settings.backup_frequency.title() }}</p>
+                        <p><strong>Time:</strong> {{ backup_settings.backup_time.strftime('%H:%M') if backup_settings.backup_time else 'N/A' }}</p>
+                        <p><strong>Location:</strong> {{ backup_settings.backup_location }}</p>
+                        <p><strong>Max Backups:</strong> {{ backup_settings.max_backups }}</p>
+                        <p><strong>Compress:</strong> {{ 'Yes' if backup_settings.compress_backups else 'No' }}</p>
+                        <p><strong>Include Files:</strong> {{ 'Yes' if backup_settings.include_attachments else 'No' }}</p>
+                        <p><strong>Email Alerts:</strong> {{ 'Yes' if backup_settings.email_notifications else 'No' }}</p>
+                        <p><strong>Status:</strong> 
+                            <span class="badge bg-{{ 'success' if backup_settings.is_active else 'secondary' }}">
+                                {{ 'Active' if backup_settings.is_active else 'Inactive' }}
+                            </span>
+                        </p>
+                    {% else %}
+                        <p class="text-muted">No backup settings configured yet. Please save your settings.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block title %}Email Notifications Dashboard - GTN Engineering IT Helpdesk{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header mb-4">
+        <div class="row align-items-center">
+            <div class="col">
+                <h1 class="page-title">
+                    <i class="ri-mail-send-line text-primary"></i>
+                    Email Notifications Dashboard
+                </h1>
+                <p class="page-subtitle">Monitor email notification delivery status and troubleshoot issues</p>
+            </div>
+            <div class="col-auto">
+                <a href="{{ url_for('master_data_dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="ri-arrow-left-line"></i> Back to Master Data
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="stat-card stat-primary">
+                <div class="stat-icon">
+                    <i class="ri-mail-line"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number">{{ stats.total_notifications }}</h3>
+                    <p class="stat-label">Total Notifications</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stat-card stat-success">
+                <div class="stat-icon">
+                    <i class="ri-check-line"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number">{{ stats.sent_notifications }}</h3>
+                    <p class="stat-label">Successfully Sent</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stat-card stat-danger">
+                <div class="stat-icon">
+                    <i class="ri-error-warning-line"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number">{{ stats.failed_notifications }}</h3>
+                    <p class="stat-label">Failed</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stat-card stat-info">
+                <div class="stat-icon">
+                    <i class="ri-percent-line"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number">{{ stats.success_rate }}%</h3>
+                    <p class="stat-label">Success Rate</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-4">
+                    <label for="status" class="form-label">Status</label>
+                    <select name="status" id="status" class="form-select">
+                        <option value="all" {{ 'selected' if status_filter == 'all' }}>All Statuses</option>
+                        <option value="sent" {{ 'selected' if status_filter == 'sent' }}>Sent</option>
+                        <option value="failed" {{ 'selected' if status_filter == 'failed' }}>Failed</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="message_type" class="form-label">Message Type</label>
+                    <select name="message_type" id="message_type" class="form-select">
+                        <option value="all" {{ 'selected' if message_type_filter == 'all' }}>All Types</option>
+                        <option value="ticket_created" {{ 'selected' if message_type_filter == 'ticket_created' }}>Ticket Created</option>
+                        <option value="ticket_assigned" {{ 'selected' if message_type_filter == 'ticket_assigned' }}>Ticket Assigned</option>
+                        <option value="ticket_updated" {{ 'selected' if message_type_filter == 'ticket_updated' }}>Ticket Updated</option>
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="ri-filter-line"></i> Filter
+                    </button>
+                    <a href="{{ url_for('email_notifications_dashboard') }}" class="btn btn-outline-secondary">
+                        <i class="ri-refresh-line"></i> Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notifications Table -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">
+                <i class="ri-list-check-line"></i>
+                Email Notification History
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if notifications %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date/Time</th>
+                                <th>Recipient</th>
+                                <th>Subject</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Ticket</th>
+                                <th>Error Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for notification in notifications %}
+                                <tr>
+                                    <td>
+                                        <small class="text-muted">{{ notification.created_at|to_ist }}</small>
+                                    </td>
+                                    <td>
+                                        <i class="ri-mail-line text-muted me-1"></i>
+                                        {{ notification.to_email }}
+                                    </td>
+                                    <td>
+                                        <span class="fw-medium">{{ notification.subject }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-outline-primary">
+                                            {{ notification.message_type.replace('_', ' ').title() }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if notification.status == 'sent' %}
+                                            <span class="badge bg-success">
+                                                <i class="ri-check-line"></i> Sent
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-danger">
+                                                <i class="ri-error-warning-line"></i> Failed
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if notification.ticket %}
+                                            <a href="{{ url_for('view_ticket', ticket_id=notification.ticket.id) }}" 
+                                               class="text-decoration-none">
+                                                <i class="ri-ticket-line"></i>
+                                                {{ notification.ticket.ticket_number }}
+                                            </a>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if notification.error_message %}
+                                            <span class="text-danger" title="{{ notification.error_message }}">
+                                                <i class="ri-error-warning-line"></i>
+                                                Error Details
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="ri-mail-line text-muted" style="font-size: 3rem;"></i>
+                    <h5 class="mt-3 text-muted">No Email Notifications Found</h5>
+                    <p class="text-muted">Email notifications will appear here once they are sent from the system.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--gray-200);
+    transition: var(--transition-base);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stat-card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.stat-primary .stat-icon { background: var(--primary-color); }
+.stat-success .stat-icon { background: var(--success-color); }
+.stat-danger .stat-icon { background: var(--danger-color); }
+.stat-info .stat-icon { background: var(--accent-color); }
+
+.stat-content .stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--gray-900);
+}
+
+.stat-content .stat-label {
+    margin: 0;
+    color: var(--gray-600);
+    font-size: 0.9rem;
+}
+
+.badge-outline-primary {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary-color);
+    border: 1px solid rgba(37, 99, 235, 0.2);
+}
+</style>
+{% endblock %}

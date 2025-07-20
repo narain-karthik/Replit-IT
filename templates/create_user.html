@@ -1,0 +1,766 @@
+{% extends "base.html" %}
+
+{% block title %}Create User - GTN Engineering IT Helpdesk{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10 col-xl-8">
+            <!-- Page Header -->
+            <div class="page-header mb-4">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h1 class="page-title">
+                            <i class="ri-user-add-line text-primary"></i>
+                            Create New User
+                        </h1>
+                        <p class="page-subtitle">Add a new user account to the GTN Engineering IT Helpdesk system</p>
+                    </div>
+                    <div class="col-auto">
+                        <a href="{{ url_for('manage_users') }}" class="btn btn-outline-secondary">
+                            <i class="ri-arrow-left-line"></i>
+                            Back to Users
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Creation Form -->
+            <div class="card user-form-card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="ri-account-box-line text-primary"></i>
+                        User Account Information
+                    </h5>
+                    <p class="card-subtitle">Fill in the details below to create a new user account</p>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" id="createUserForm">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Account Credentials Section -->
+                        <div class="form-section">
+                            <h6 class="section-title">
+                                <i class="ri-key-line text-primary"></i>
+                                Account Credentials
+                            </h6>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label required">{{ form.username.label.text }}</label>
+                                        {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else ""), placeholder="Enter unique username") }}
+                                        {% if form.username.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.username.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                        <div class="form-text">
+                                            <i class="ri-information-line"></i>
+                                            Must be 3-80 characters, letters and numbers only
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label required">{{ form.email.label.text }}</label>
+                                        {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), placeholder="user@gtnengineering.com") }}
+                                        {% if form.email.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.email.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                        <div class="form-text">
+                                            <i class="ri-mail-line"></i>
+                                            Ticket notifications will be sent here
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Personal Information Section -->
+                        <div class="form-section">
+                            <h6 class="section-title">
+                                <i class="ri-user-line text-primary"></i>
+                                Personal Information
+                            </h6>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label required">{{ form.first_name.label.text }}</label>
+                                        {{ form.first_name(class="form-control" + (" is-invalid" if form.first_name.errors else ""), placeholder="Enter first name") }}
+                                        {% if form.first_name.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.first_name.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label required">{{ form.last_name.label.text }}</label>
+                                        {{ form.last_name(class="form-control" + (" is-invalid" if form.last_name.errors else ""), placeholder="Enter last name") }}
+                                        {% if form.last_name.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.last_name.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Work Information Section -->
+                        <div class="form-section">
+                            <h6 class="section-title">
+                                <i class="ri-building-line text-primary"></i>
+                                Work Information
+                            </h6>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">{{ form.department.label.text }}</label>
+                                        {{ form.department(class="form-control" + (" is-invalid" if form.department.errors else ""), placeholder="e.g., Engineering, Marketing, Sales") }}
+                                        {% if form.department.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.department.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                        <div class="form-text">
+                                            <i class="ri-briefcase-line"></i>
+                                            User's department or team
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">{{ form.specialization.label.text }}</label>
+                                        {{ form.specialization(class="form-select form-select-enhanced" + (" is-invalid" if form.specialization.errors else "")) }}
+                                        {% if form.specialization.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.specialization.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                        <div class="form-text">
+                                            <i class="ri-tools-line"></i>
+                                            User's area of technical expertise
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label required">{{ form.role.label.text }}</label>
+                                        {{ form.role(class="form-select form-select-enhanced" + (" is-invalid" if form.role.errors else "")) }}
+                                        {% if form.role.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.role.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                        <div class="form-text">
+                                            <i class="ri-shield-user-line"></i>
+                                            Determines user permissions and access level
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Security Section -->
+                        <div class="form-section">
+                            <h6 class="section-title">
+                                <i class="ri-lock-line text-primary"></i>
+                                Security Settings
+                            </h6>
+                            
+                            <div class="password-section">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label required">{{ form.password.label.text }}</label>
+                                            {{ form.password(class="form-control password-input" + (" is-invalid" if form.password.errors else ""), placeholder="Create a secure password") }}
+                                            {% if form.password.errors %}
+                                                <div class="invalid-feedback">
+                                                    {% for error in form.password.errors %}{{ error }}{% endfor %}
+                                                </div>
+                                            {% endif %}
+                                            <div class="password-strength">
+                                                <div class="strength-bar">
+                                                    <div class="strength-fill"></div>
+                                                </div>
+                                                <span class="strength-text">Password strength</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label required">{{ form.password2.label.text }}</label>
+                                            {{ form.password2(class="form-control" + (" is-invalid" if form.password2.errors else ""), placeholder="Repeat the password") }}
+                                            {% if form.password2.errors %}
+                                                <div class="invalid-feedback">
+                                                    {% for error in form.password2.errors %}{{ error }}{% endfor %}
+                                                </div>
+                                            {% endif %}
+                                            <div class="password-match">
+                                                <i class="ri-check-line match-icon"></i>
+                                                <span class="match-text">Passwords must match</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="password-requirements">
+                                    <h6><i class="ri-shield-check-line"></i> Password Requirements</h6>
+                                    <div class="requirements-grid">
+                                        <div class="requirement" data-requirement="length">
+                                            <i class="ri-close-circle-line"></i>
+                                            <span>At least 6 characters</span>
+                                        </div>
+                                        <div class="requirement" data-requirement="letter">
+                                            <i class="ri-close-circle-line"></i>
+                                            <span>Contains letters</span>
+                                        </div>
+                                        <div class="requirement" data-requirement="number">
+                                            <i class="ri-close-circle-line"></i>
+                                            <span>Contains numbers</span>
+                                        </div>
+                                        <div class="requirement" data-requirement="special">
+                                            <i class="ri-close-circle-line"></i>
+                                            <span>Special characters (recommended)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Role Information Section -->
+                        <div class="form-section">
+                            <div class="role-info-cards">
+                                <h6 class="section-title">
+                                    <i class="ri-information-line text-primary"></i>
+                                    Role Permissions Overview
+                                </h6>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="role-card user-role">
+                                            <div class="role-header">
+                                                <i class="ri-user-line"></i>
+                                                <h6>User Role</h6>
+                                            </div>
+                                            <ul class="role-permissions">
+                                                <li><i class="ri-check-line"></i> Create support tickets</li>
+                                                <li><i class="ri-check-line"></i> View own tickets</li>
+                                                <li><i class="ri-check-line"></i> Add comments to tickets</li>
+                                                <li><i class="ri-check-line"></i> Update profile information</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="role-card admin-role">
+                                            <div class="role-header">
+                                                <i class="ri-shield-user-line"></i>
+                                                <h6>Super Admin Role</h6>
+                                            </div>
+                                            <ul class="role-permissions">
+                                                <li><i class="ri-check-line"></i> All user permissions</li>
+                                                <li><i class="ri-check-line"></i> View all tickets</li>
+                                                <li><i class="ri-check-line"></i> Assign tickets</li>
+                                                <li><i class="ri-check-line"></i> Manage users</li>
+                                                <li><i class="ri-check-line"></i> Generate reports</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="form-actions">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <div class="creation-info">
+                                        <i class="ri-user-add-line text-primary"></i>
+                                        <div class="info-text">
+                                            <h6>Account Creation</h6>
+                                            <p>User will receive account details and can change password on first login</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 text-md-end">
+                                    <div class="button-group">
+                                        <a href="{{ url_for('manage_users') }}" class="btn btn-outline-secondary btn-lg me-2">
+                                            <i class="ri-arrow-left-line"></i>
+                                            Cancel
+                                        </a>
+                                        {{ form.submit(class="btn btn-primary btn-lg") }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Create User Specific Styles */
+.page-header {
+    padding: 2rem 0 1rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.page-subtitle {
+    color: #6c757d;
+    font-size: 1.1rem;
+    margin-bottom: 0;
+}
+
+.user-form-card {
+    border: none;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border-radius: 12px;
+}
+
+.card-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    padding: 1.5rem;
+}
+
+.card-title {
+    color: #2c3e50;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-subtitle {
+    color: #6c757d;
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+}
+
+.form-section {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.section-title {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label.required::after {
+    content: ' *';
+    color: #dc3545;
+}
+
+.form-control, .form-select {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-select-enhanced {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e");
+}
+
+.password-section {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+.password-strength {
+    margin-top: 0.5rem;
+}
+
+.strength-bar {
+    height: 4px;
+    background: #e9ecef;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.strength-fill {
+    height: 100%;
+    width: 0%;
+    transition: all 0.3s ease;
+    border-radius: 2px;
+}
+
+.strength-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.password-match {
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.match-icon {
+    color: #6c757d;
+    transition: all 0.3s ease;
+}
+
+.match-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+    transition: all 0.3s ease;
+}
+
+.password-requirements {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #dee2e6;
+}
+
+.password-requirements h6 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.requirements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.5rem;
+}
+
+.requirement {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.requirement i {
+    color: #dc3545;
+    transition: all 0.3s ease;
+}
+
+.requirement.met i {
+    color: #28a745;
+}
+
+.requirement span {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.role-info-cards {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.role-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    border-left: 4px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.role-card.user-role {
+    border-left-color: #007bff;
+}
+
+.role-card.admin-role {
+    border-left-color: #28a745;
+}
+
+.role-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.role-header i {
+    font-size: 1.2rem;
+    color: #007bff;
+}
+
+.admin-role .role-header i {
+    color: #28a745;
+}
+
+.role-header h6 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin: 0;
+}
+
+.role-permissions {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.role-permissions li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    color: #6c757d;
+}
+
+.role-permissions li i {
+    color: #28a745;
+    font-size: 0.875rem;
+}
+
+.form-actions {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-radius: 8px;
+    margin-top: 2rem;
+}
+
+.creation-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.creation-info i {
+    font-size: 2rem;
+}
+
+.info-text h6 {
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+}
+
+.info-text p {
+    color: #6c757d;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.button-group {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.btn-lg {
+    padding: 0.75rem 2rem;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .button-group {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btn-lg {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-actions .row {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .creation-info {
+        justify-content: center;
+        text-align: center;
+    }
+    
+    .requirements-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('createUserForm');
+    const passwordInput = form.querySelector('input[name="password"]');
+    const confirmPasswordInput = form.querySelector('input[name="password2"]');
+    const strengthBar = document.querySelector('.strength-fill');
+    const strengthText = document.querySelector('.strength-text');
+    const matchIcon = document.querySelector('.match-icon');
+    const matchText = document.querySelector('.match-text');
+    const requirements = document.querySelectorAll('.requirement');
+    
+    // Password strength checker
+    function checkPasswordStrength(password) {
+        let score = 0;
+        let feedback = 'Weak';
+        let color = '#dc3545';
+        
+        if (password.length >= 6) score += 20;
+        if (password.length >= 8) score += 10;
+        if (/[a-z]/.test(password)) score += 15;
+        if (/[A-Z]/.test(password)) score += 15;
+        if (/[0-9]/.test(password)) score += 15;
+        if (/[^A-Za-z0-9]/.test(password)) score += 25;
+        
+        if (score >= 70) {
+            feedback = 'Strong';
+            color = '#28a745';
+        } else if (score >= 40) {
+            feedback = 'Medium';
+            color = '#ffc107';
+        }
+        
+        return { score, feedback, color };
+    }
+    
+    // Update password requirements
+    function updateRequirements(password) {
+        const checks = [
+            { requirement: 'length', test: password.length >= 6 },
+            { requirement: 'letter', test: /[a-zA-Z]/.test(password) },
+            { requirement: 'number', test: /[0-9]/.test(password) },
+            { requirement: 'special', test: /[^A-Za-z0-9]/.test(password) }
+        ];
+        
+        checks.forEach(check => {
+            const element = document.querySelector(`[data-requirement="${check.requirement}"]`);
+            if (element) {
+                if (check.test) {
+                    element.classList.add('met');
+                    element.querySelector('i').className = 'ri-check-circle-line';
+                } else {
+                    element.classList.remove('met');
+                    element.querySelector('i').className = 'ri-close-circle-line';
+                }
+            }
+        });
+    }
+    
+    // Check password match
+    function checkPasswordMatch() {
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+        
+        if (confirmPassword.length === 0) {
+            matchIcon.className = 'ri-check-line match-icon';
+            matchIcon.style.color = '#6c757d';
+            matchText.style.color = '#6c757d';
+            matchText.textContent = 'Passwords must match';
+        } else if (password === confirmPassword) {
+            matchIcon.className = 'ri-check-circle-line match-icon';
+            matchIcon.style.color = '#28a745';
+            matchText.style.color = '#28a745';
+            matchText.textContent = 'Passwords match';
+        } else {
+            matchIcon.className = 'ri-close-circle-line match-icon';
+            matchIcon.style.color = '#dc3545';
+            matchText.style.color = '#dc3545';
+            matchText.textContent = 'Passwords do not match';
+        }
+    }
+    
+    // Password input event listener
+    if (passwordInput) {
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            const strength = checkPasswordStrength(password);
+            
+            // Update strength bar
+            strengthBar.style.width = strength.score + '%';
+            strengthBar.style.backgroundColor = strength.color;
+            strengthText.textContent = `Password strength: ${strength.feedback}`;
+            strengthText.style.color = strength.color;
+            
+            // Update requirements
+            updateRequirements(password);
+            
+            // Check password match
+            checkPasswordMatch();
+        });
+    }
+    
+    // Confirm password input event listener
+    if (confirmPasswordInput) {
+        confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+    }
+    
+    // Form submission enhancement
+    form.addEventListener('submit', function(e) {
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.innerHTML = '<i class="ri-loader-line spin"></i> Creating User...';
+            submitBtn.disabled = true;
+        }
+    });
+    
+    // Username validation
+    const usernameInput = form.querySelector('input[name="username"]');
+    if (usernameInput) {
+        usernameInput.addEventListener('input', function() {
+            const value = this.value;
+            const isValid = /^[a-zA-Z0-9_]{3,80}$/.test(value);
+            
+            if (value.length > 0 && !isValid) {
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

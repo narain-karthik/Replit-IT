@@ -1,0 +1,43 @@
+{% extends "base.html" %} 
+
+{% block main_class %}main-content-home{% endblock %}
+
+{% block content %}
+<!-- Compact Hero Section -->
+<section class="hero-section">
+    <div class="hero-gradient">
+        <div class="container">
+            <div class="row align-items-center justify-content-center" style="height: 100%;">
+                <div class="col-lg-8 text-center">
+                    <div class="hero-content">
+                        <div class="hero-badge mb-4">
+                            <i class="ri-shield-check-line"></i>
+                            <span>Trusted IT Support</span>
+                        </div>
+                        <h1 class="hero-title mb-4">
+                            Professional IT Helpdesk
+                            <span class="text-gradient">Solutions</span>
+                        </h1>
+                        <p class="hero-description mb-4">
+                            Get fast, reliable technical support for all your IT
+                            needs. Our expert team is here to help you resolve
+                            issues quickly and efficiently.
+                        </p>
+                        <!--
+                        <div class="hero-actions">
+                            <a
+                                href="{{ url_for('common_login') }}"
+                                class="btn btn-primary btn-hero"
+                            >
+                                <i class="ri-login-box-line"></i>
+                                Access Helpdesk
+                            </a>
+                        </div>
+                        -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
