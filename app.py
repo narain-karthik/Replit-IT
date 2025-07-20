@@ -175,19 +175,66 @@ with app.app_context():
         super_admin.set_password('admin123')
         db.session.add(super_admin)
         
-        # Create test user
-        test_user = User(
-            username='testuser',
-            email='testuser@gtn.com',
+        # Create HOD for Engineering department
+        hod_engineering = User(
+            username='hodeng',
+            email='hod.engineering@gtn.com',
+            first_name='Engineering',
+            last_name='HOD',
+            department='Engineering',
+            role='hod'
+        )
+        hod_engineering.set_password('hod123')
+        db.session.add(hod_engineering)
+        
+        # Create HOD for IT department
+        hod_it = User(
+            username='hodit',
+            email='hod.it@gtn.com',
+            first_name='IT',
+            last_name='HOD',
+            department='IT',
+            role='hod'
+        )
+        hod_it.set_password('hod123')
+        db.session.add(hod_it)
+        
+        # Create admin user
+        admin_user = User(
+            username='admin',
+            email='admin@gtn.com',
+            first_name='System',
+            last_name='Admin',
+            department='IT',
+            role='admin'
+        )
+        admin_user.set_password('admin123')
+        db.session.add(admin_user)
+        
+        # Create test users in different departments
+        test_user_eng = User(
+            username='testuser_eng',
+            email='testuser.eng@gtn.com',
             first_name='Test',
-            last_name='User',
-            department='General',
+            last_name='Engineer',
+            department='Engineering',
             role='user'
         )
-        test_user.set_password('user123')
-        db.session.add(test_user)
+        test_user_eng.set_password('user123')
+        db.session.add(test_user_eng)
         
-        logging.info("Default super admin and test user created")
+        test_user_it = User(
+            username='testuser_it',
+            email='testuser.it@gtn.com',
+            first_name='Test',
+            last_name='ITUser',
+            department='IT',
+            role='user'
+        )
+        test_user_it.set_password('user123')
+        db.session.add(test_user_it)
+        
+        logging.info("Default users created: Super Admin, HODs, Admin, and Test Users")
     
     try:
         db.session.commit()

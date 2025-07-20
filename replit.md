@@ -40,8 +40,9 @@ The GTN Engineering IT Helpdesk System is a comprehensive Flask-based web applic
 3. **TicketComment Model**: Enables comment system for ticket updates
 
 ### Role-Based Access Control
-- **Super Admin**: Full system access, user management, ticket oversight
-- **Admin**: Ticket management, assignment capabilities
+- **Super Admin**: Full system access, user management, ticket oversight, reports
+- **Admin**: Complete ticket management, assignment capabilities, view all tickets
+- **HOD (Head of Department)**: Department-specific ticket viewing, can see all tickets from users in their department, comment on department tickets
 - **User**: Ticket creation and personal ticket management
 
 ### Automatic System Detection
@@ -102,6 +103,16 @@ The GTN Engineering IT Helpdesk System is a comprehensive Flask-based web applic
 
 ## Changelog
 
+- July 20, 2025: **Major Feature Addition: HOD (Head of Department) Role System**
+  - Added new user role 'hod' with department-wise ticket viewing capabilities
+  - HODs can view all tickets from users in their department
+  - HODs can comment on department tickets and view all ticket updates
+  - Added dedicated HOD dashboard with department statistics
+  - Enhanced admin role with full ticket management capabilities
+  - Updated ticket viewing permissions to support HOD department-based access
+  - Created default test users: HOD Engineering, HOD IT, Admin, and department test users
+  - Enhanced role-based access control throughout the application
+- July 20, 2025: Successfully completed migration from Replit Agent to Replit environment with PostgreSQL database
 - June 28, 2025: Cleaned up project by removing unwanted files (__pycache__ directories, obsolete login templates, test upload files) and added comprehensive .gitignore
 - June 28, 2025: Enhanced Super Admin privileges to allow full control over all user accounts including other Super Admin accounts
 - June 28, 2025: Removed frontend restrictions that previously prevented Super Admins from editing/deleting other Super Admin accounts
