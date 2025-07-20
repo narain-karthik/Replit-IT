@@ -43,7 +43,7 @@ A comprehensive Flask-based IT helpdesk management system with modern UI/UX desi
 
 ## 🗄️ Database Schema
 
-### **Core Tables** (11 Tables Total)
+### **Core Tables** (12 Tables Total)
 
 #### **Users Table**
 ```sql
@@ -212,94 +212,18 @@ CREATE TABLE email_notification_logs (
     user_id INTEGER REFERENCES users(id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-```
-    priority VARCHAR(20) NOT NULL,
-    status VARCHAR(20) NOT NULL DEFAULT 'Open',
-    user_name VARCHAR(100) NOT NULL,
-    user_ip_address VARCHAR(45),
-    user_system_name VARCHAR(100),
-    image_filename VARCHAR(255),
-    user_id INTEGER REFERENCES users(id) NOT NULL,
-    assigned_to INTEGER REFERENCES users(id),
-    assigned_by INTEGER REFERENCES users(id),
+
+#### **Master Departments Table** (NEW)
+```sql
+CREATE TABLE master_departments (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL,
+    code VARCHAR(10) UNIQUE NOT NULL, -- Short code like ENG, IT, HR
+    description VARCHAR(200),
+    head_of_department_id INTEGER REFERENCES users(id),
+    is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    resolved_at TIMESTAMP
-);
-```
-
-#### **Ticket Comments Table**
-```sql
-CREATE TABLE ticket_comments (
-    id SERIAL PRIMARY KEY,
-    ticket_id INTEGER REFERENCES tickets(id) NOT NULL,
-    user_id INTEGER REFERENCES users(id) NOT NULL,
-    comment TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-#### **Attachments Table**
-```sql
-CREATE TABLE attachments (
-    id SERIAL PRIMARY KEY,
-    ticket_id INTEGER REFERENCES tickets(id) NOT NULL,
-    filename VARCHAR(255) NOT NULL,
-    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-### **Master Data Tables**
-
-#### **Categories Table**
-```sql
-CREATE TABLE master_data_categories (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(50) UNIQUE NOT NULL,
-    description TEXT,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-#### **Priorities Table**
-```sql
-CREATE TABLE master_data_priorities (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(20) UNIQUE NOT NULL,
-    description TEXT,
-    level INTEGER NOT NULL, -- 1-4 (Low to Critical)
-    color_code VARCHAR(7), -- Hex color code
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-#### **Statuses Table**
-```sql
-CREATE TABLE master_data_statuses (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(20) UNIQUE NOT NULL,
-    description TEXT,
-    color_code VARCHAR(7), -- Hex color code
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-#### **Email Settings Table**
-```sql
-CREATE TABLE email_settings (
-    id SERIAL PRIMARY KEY,
-    smtp_server VARCHAR(100) NOT NULL,
-    smtp_port INTEGER NOT NULL,
-    smtp_username VARCHAR(100) NOT NULL,
-    smtp_password VARCHAR(255) NOT NULL,
-    use_tls BOOLEAN DEFAULT TRUE,
-    from_email VARCHAR(100),
-    from_name VARCHAR(100),
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
 
