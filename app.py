@@ -199,17 +199,7 @@ with app.app_context():
         hod_it.set_password('hod123')
         db.session.add(hod_it)
         
-        # Create admin user
-        admin_user = User(
-            username='admin',
-            email='admin@gtn.com',
-            first_name='System',
-            last_name='Admin',
-            department='IT',
-            role='admin'
-        )
-        admin_user.set_password('admin123')
-        db.session.add(admin_user)
+
         
         # Create test users in different departments
         test_user_eng = User(
@@ -234,7 +224,7 @@ with app.app_context():
         test_user_it.set_password('user123')
         db.session.add(test_user_it)
         
-        logging.info("Default users created: Super Admin, HODs, Admin, and Test Users")
+        logging.info("Default users created: Super Admin, HODs, and Test Users")
     
     try:
         db.session.commit()

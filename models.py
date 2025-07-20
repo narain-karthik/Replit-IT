@@ -13,7 +13,7 @@ class User(db.Model):
     last_name = db.Column(db.String(50), nullable=False)
     department = db.Column(db.String(100), nullable=True)
     specialization = db.Column(db.String(50), nullable=True)  # Hardware, Software
-    role = db.Column(db.String(50), nullable=False, default='user')  # user, hod, admin, super_admin
+    role = db.Column(db.String(50), nullable=False, default='user')  # user, hod, super_admin
     ip_address = db.Column(db.String(45), nullable=True)  # IPv4/IPv6
     system_name = db.Column(db.String(100), nullable=True)
     profile_image = db.Column(db.String(200), nullable=True)
@@ -44,17 +44,15 @@ class User(db.Model):
     def is_hod(self):
         return self.role == 'hod'
     
-    @property
-    def is_admin(self):
-        return self.role == 'admin'
+
     
     @property
     def can_manage_tickets(self):
-        return self.role in ['admin', 'super_admin']
+        return self.role in ['super_admin']
     
     @property
     def can_view_department_tickets(self):
-        return self.role in ['hod', 'admin', 'super_admin']
+        return self.role in ['hod', 'super_admin']
     
 
     

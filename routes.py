@@ -73,19 +73,7 @@ def hod_required(f):
     decorated_function.__name__ = f.__name__
     return decorated_function
 
-# Helper function to require admin or super admin access
-def admin_required(f):
-    def decorated_function(*args, **kwargs):
-        if not is_logged_in():
-            flash('Please log in to access this page.', 'warning')
-            return redirect(url_for('common_login'))
-        user = get_current_user()
-        if not user or not user.can_manage_tickets:
-            flash('Admin access required.', 'error')
-            return redirect(url_for('index'))
-        return f(*args, **kwargs)
-    decorated_function.__name__ = f.__name__
-    return decorated_function
+
 
 @app.route('/')
 def index():
@@ -102,8 +90,7 @@ def common_login():
             return redirect(url_for('super_admin_dashboard'))
         elif user.is_hod:
             return redirect(url_for('hod_dashboard'))
-        elif user.is_admin:
-            return redirect(url_for('admin_dashboard'))
+
         else:
             return redirect(url_for('user_dashboard'))
     
@@ -130,8 +117,7 @@ def common_login():
                 return redirect(url_for('super_admin_dashboard'))
             elif user.is_hod:
                 return redirect(url_for('hod_dashboard'))
-            elif user.is_admin:
-                return redirect(url_for('admin_dashboard'))
+
             else:
                 return redirect(url_for('user_dashboard'))
         else:
@@ -281,61 +267,7 @@ def hod_dashboard():
                          category_filter=category_filter,
                          search_query=search_query)
 
-@app.route('/admin-dashboard')
-@admin_required
-def admin_dashboard():
-    """Admin dashboard for ticket management"""
-    user = get_current_user()
-    if not user.can_manage_tickets:
-        flash('Admin access required.', 'error')
-        return redirect(url_for('index'))
 
-    # Get filter parameters
-    status_filter = request.args.get('status', 'all')
-    priority_filter = request.args.get('priority', 'all')
-    category_filter = request.args.get('category', 'all')
-    search_query = request.args.get('search', '')
-
-    # Build query for all tickets (admins can see all tickets)
-    query = Ticket.query
-
-    if status_filter != 'all':
-        query = query.filter(Ticket.status == status_filter)
-    
-    if priority_filter != 'all':
-        query = query.filter(Ticket.priority == priority_filter)
-    
-    if category_filter != 'all':
-        query = query.filter(Ticket.category == category_filter)
-    
-    if search_query:
-        query = query.filter(Ticket.title.contains(search_query))
-
-    tickets = query.order_by(Ticket.created_at.desc()).all()
-
-    # Admin statistics
-    total_tickets = Ticket.query.count()
-    open_tickets = Ticket.query.filter_by(status='Open').count()
-    in_progress_tickets = Ticket.query.filter_by(status='In Progress').count()
-    resolved_tickets = Ticket.query.filter_by(status='Resolved').count()
-    assigned_to_me = Ticket.query.filter_by(assigned_to=user.id).count()
-
-    stats = {
-        'total_tickets': total_tickets,
-        'open_tickets': open_tickets,
-        'in_progress_tickets': in_progress_tickets,
-        'resolved_tickets': resolved_tickets,
-        'assigned_to_me': assigned_to_me
-    }
-
-    return render_template('admin_dashboard.html', 
-                         user=user, 
-                         tickets=tickets, 
-                         stats=stats,
-                         status_filter=status_filter,
-                         priority_filter=priority_filter,
-                         category_filter=category_filter,
-                         search_query=search_query)
 
 @app.route('/super-admin-dashboard')
 @super_admin_required
@@ -352,7 +284,7 @@ def super_admin_dashboard():
     in_progress_tickets = Ticket.query.filter_by(status='In Progress').count()
     resolved_tickets = Ticket.query.filter_by(status='Resolved').count()
     total_users = User.query.filter_by(role='user').count()
-    total_admins = User.query.filter_by(role='admin').count()
+    total_hods = User.query.filter_by(role='hod').count()
     hardware_tickets = Ticket.query.filter_by(category='Hardware').count()
     software_tickets = Ticket.query.filter_by(category='Software').count()
 
@@ -362,7 +294,7 @@ def super_admin_dashboard():
         'in_progress_tickets': in_progress_tickets,
         'resolved_tickets': resolved_tickets,
         'total_users': total_users,
-        'total_admins': total_admins,
+        'total_hods': total_hods,
         'hardware_tickets': hardware_tickets,
         'software_tickets': software_tickets
     }
@@ -542,8 +474,8 @@ def view_ticket(ticket_id):
     
     # Check if user can view this ticket
     can_view = False
-    if user.is_super_admin or user.is_admin:
-        can_view = True  # Super admins and admins can view all tickets
+    if user.is_super_admin:
+        can_view = True  # Super admins can view all tickets
     elif user.is_hod:
         # HODs can view tickets from their department
         ticket_user = User.query.get(ticket.user_id)
@@ -570,8 +502,8 @@ def add_comment(ticket_id):
     
     # Check if user can comment on this ticket
     can_comment = False
-    if user.is_super_admin or user.is_admin:
-        can_comment = True  # Super admins and admins can comment on all tickets
+    if user.is_super_admin:
+        can_comment = True  # Super admins can comment on all tickets
     elif user.is_hod:
         # HODs can comment on tickets from their department
         ticket_user = User.query.get(ticket.user_id)
@@ -1073,7 +1005,7 @@ def edit_assignment(ticket_id):
             flash('Error updating assignment. Please try again.', 'error')
             logging.error(f"Error updating ticket assignment: {e}")
     
-    # Get all admin users for assignment dropdown
+    # Get all super admin users for assignment dropdown
     admin_users = User.query.filter_by(role="super_admin").all()
     
     return render_template('edit_assignment.html', ticket=ticket, admin_users=admin_users)
@@ -1091,7 +1023,7 @@ def view_image(filename):
     
     # Check permissions - admins/super admins can view any, HODs can view their department, users only their own tickets
     can_view = False
-    if current_user.is_super_admin or current_user.is_admin:
+    if current_user.is_super_admin:
         can_view = True
     elif current_user.is_hod:
         ticket_user = User.query.get(ticket.user_id)
@@ -1121,7 +1053,7 @@ def download_attachment(filename):
     
     # Check permissions - admins can download any, HODs can download their department, users only their own tickets
     can_download = False
-    if current_user.is_super_admin or current_user.is_admin:
+    if current_user.is_super_admin:
         can_download = True
     else:
         ticket = Ticket.query.get(attachment.ticket_id)

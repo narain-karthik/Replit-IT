@@ -73,7 +73,6 @@ class UserRegistrationForm(FlaskForm):
     role = SelectField('Role', choices=[
         ('user', 'User'),
         ('hod', 'HOD (Head of Department)'),
-        ('admin', 'Admin'),
         ('super_admin', 'Super Admin')
     ], validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
@@ -87,7 +86,6 @@ class UserProfileForm(FlaskForm):
     role = SelectField('Role', choices=[
         ('user', 'User'),
         ('hod', 'HOD (Head of Department)'),
-        ('admin', 'Admin'),
         ('super_admin', 'Super Admin')
     ], validators=[DataRequired()])
     first_name = StringField('First Name', validators=[DataRequired(), Length(min=2, max=50)])
@@ -109,7 +107,7 @@ class AssignTicketForm(FlaskForm):
     
     def __init__(self, *args, **kwargs):
         super(AssignTicketForm, self).__init__(*args, **kwargs)
-        self.assigned_to.choices = [(user.id, user.full_name) for user in User.query.filter(User.role.in_(['admin', 'super_admin'])).all()]
+        self.assigned_to.choices = [(user.id, user.full_name) for user in User.query.filter(User.role.in_(['super_admin'])).all()]
 
 
 # Master Data Forms
