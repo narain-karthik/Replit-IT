@@ -87,7 +87,7 @@ class UserRegistrationForm(FlaskForm):
         
         # Load departments from master data
         departments = MasterDataDepartment.query.filter_by(is_active=True).all()
-        self.department.choices = [('', 'Select Department')] + [(dept.name, dept.name) for dept in departments]
+        self.department.choices = [('None', 'Select Department')] + [(dept.name, dept.name) for dept in departments]
 
 class UserProfileForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=50)])
@@ -115,7 +115,7 @@ class UserProfileForm(FlaskForm):
         
         # Load departments from master data
         departments = MasterDataDepartment.query.filter_by(is_active=True).all()
-        self.department.choices = [('', 'Select Department')] + [(dept.name, dept.name) for dept in departments]
+        self.department.choices = [('None', 'Select Department')] + [(dept.name, dept.name) for dept in departments]
 
 class AssignTicketForm(FlaskForm):
     assigned_to = SelectField('Assign To', coerce=int, validators=[DataRequired()])
@@ -171,7 +171,7 @@ class MasterDataDepartmentForm(FlaskForm):
         
         # Load HODs for department head selection
         hods = User.query.filter_by(role='hod').all()
-        self.head_of_department_id.choices = [('', 'Select HOD')] + [(user.id, user.full_name) for user in hods]
+        self.head_of_department_id.choices = [(0, 'Select HOD')] + [(user.id, user.full_name) for user in hods]
 
 
 
