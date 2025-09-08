@@ -126,7 +126,7 @@ class MasterDataCategory(db.Model):
     __tablename__ = 'master_categories'
     
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True, nullable=False)
+    name = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(200), nullable=True)
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -138,7 +138,7 @@ class MasterDataPriority(db.Model):
     __tablename__ = 'master_priorities'
     
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(20), unique=True, nullable=False)
+    name = db.Column(db.String(20), nullable=False)
     description = db.Column(db.String(200), nullable=True)
     level = db.Column(db.Integer, nullable=False)  # 1=Low, 2=Medium, 3=High, 4=Critical
     color_code = db.Column(db.String(7), nullable=True)  # Hex color for UI
@@ -152,7 +152,7 @@ class MasterDataStatus(db.Model):
     __tablename__ = 'master_statuses'
     
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(20), unique=True, nullable=False)
+    name = db.Column(db.String(20), nullable=False)
     description = db.Column(db.String(200), nullable=True)
     color_code = db.Column(db.String(7), nullable=True)  # Hex color for UI
     is_active = db.Column(db.Boolean, default=True)
@@ -165,8 +165,8 @@ class MasterDataDepartment(db.Model):
     __tablename__ = 'master_departments'
     
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), unique=True, nullable=False)
-    code = db.Column(db.String(10), unique=True, nullable=False)  # Short code like ENG, IT, HR
+    name = db.Column(db.String(100), nullable=False)
+    code = db.Column(db.String(10), nullable=False)  # Short code like ENG, IT, HR
     description = db.Column(db.String(200), nullable=True)
     head_of_department_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     is_active = db.Column(db.Boolean, default=True)

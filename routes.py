@@ -1413,14 +1413,10 @@ def manage_departments():
             head_of_department_id=form.head_of_department_id.data if form.head_of_department_id.data else None,
             is_active=form.is_active.data
         )
-        try:
-            db.session.add(department)
-            db.session.commit()
-            flash(f'Department "{department.name}" created successfully!', 'success')
-            return redirect(url_for('manage_departments'))
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Error creating department: {str(e)}', 'error')
+        db.session.add(department)
+        db.session.commit()
+        flash(f'Department "{department.name}" created successfully!', 'success')
+        return redirect(url_for('manage_departments'))
     
     return render_template('master_data/departments.html', form=form, departments=departments)
 
@@ -1440,13 +1436,9 @@ def edit_department(department_id):
         department.is_active = form.is_active.data
         department.updated_at = datetime.utcnow()
         
-        try:
-            db.session.commit()
-            flash(f'Department "{department.name}" updated successfully!', 'success')
-            return redirect(url_for('manage_departments'))
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Error updating department: {str(e)}', 'error')
+        db.session.commit()
+        flash(f'Department "{department.name}" updated successfully!', 'success')
+        return redirect(url_for('manage_departments'))
     
     return render_template('master_data/edit_department.html', form=form, department=department)
 
