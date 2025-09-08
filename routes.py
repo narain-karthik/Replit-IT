@@ -1191,7 +1191,6 @@ def master_data_dashboard():
     categories = MasterDataCategory.query.all()
     priorities = MasterDataPriority.query.order_by(MasterDataPriority.level).all()
     statuses = MasterDataStatus.query.all()
-    departments = MasterDataDepartment.query.all()
     email_settings = EmailSettings.query.first()
     timezone_settings = TimezoneSettings.query.first()
     backup_settings = BackupSettings.query.first()
@@ -1207,7 +1206,6 @@ def master_data_dashboard():
                          categories=categories,
                          priorities=priorities, 
                          statuses=statuses,
-                         departments=departments,
                          email_settings=email_settings,
                          timezone_settings=timezone_settings,
                          backup_settings=backup_settings,

@@ -64,7 +64,7 @@ class UserRegistrationForm(FlaskForm):
     email = EmailField('Email', validators=[DataRequired(), Email()])
     first_name = StringField('First Name', validators=[DataRequired(), Length(min=2, max=50)])
     last_name = StringField('Last Name', validators=[DataRequired(), Length(min=2, max=50)])
-    department = SelectField('Department', choices=[], validators=[Optional()])
+    department = StringField('Department', validators=[Optional(), Length(max=100)])
     specialization = SelectField('Specialization', choices=[
         ('', 'Select Specialization'),
         ('Hardware', 'Hardware Support'),
@@ -80,14 +80,6 @@ class UserRegistrationForm(FlaskForm):
         DataRequired(), EqualTo('password', message='Passwords must match')
     ])
     submit = SubmitField('Register')
-    
-    def __init__(self, *args, **kwargs):
-        super(UserRegistrationForm, self).__init__(*args, **kwargs)
-        from models import MasterDataDepartment
-        
-        # Load departments from master data
-        departments = MasterDataDepartment.query.filter_by(is_active=True).all()
-        self.department.choices = [('None', 'Select Department')] + [(dept.name, dept.name) for dept in departments]
 
 class UserProfileForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=50)])
@@ -99,7 +91,7 @@ class UserProfileForm(FlaskForm):
     first_name = StringField('First Name', validators=[DataRequired(), Length(min=2, max=50)])
     last_name = StringField('Last Name', validators=[DataRequired(), Length(min=2, max=50)])
     email = EmailField('Email', validators=[DataRequired(), Email()])
-    department = SelectField('Department', choices=[], validators=[Optional()])
+    department = StringField('Department', validators=[Optional(), Length(max=100)])
     specialization = SelectField('Specialization', choices=[
         ('', 'Select Specialization'),
         ('Hardware', 'Hardware Support'),
@@ -108,14 +100,6 @@ class UserProfileForm(FlaskForm):
     system_name = StringField('System Name', validators=[Length(max=100)])
     password = PasswordField('Password', validators=[Optional(), Length(min=6, max=128)])
     submit = SubmitField('Update Profile')
-    
-    def __init__(self, *args, **kwargs):
-        super(UserProfileForm, self).__init__(*args, **kwargs)
-        from models import MasterDataDepartment
-        
-        # Load departments from master data
-        departments = MasterDataDepartment.query.filter_by(is_active=True).all()
-        self.department.choices = [('None', 'Select Department')] + [(dept.name, dept.name) for dept in departments]
 
 class AssignTicketForm(FlaskForm):
     assigned_to = SelectField('Assign To', coerce=int, validators=[DataRequired()])

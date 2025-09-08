@@ -122,19 +122,6 @@ with app.app_context():
         for status in statuses:
             db.session.add(status)
     
-    # Create default departments
-    from models import MasterDataDepartment
-    if MasterDataDepartment.query.count() == 0:
-        departments = [
-            MasterDataDepartment(name='Engineering', code='ENG', description='Engineering Department - Design and development', is_active=True),
-            MasterDataDepartment(name='Information Technology', code='IT', description='Information Technology Department - System administration and support', is_active=True),
-            MasterDataDepartment(name='Human Resources', code='HR', description='Human Resources Department - Employee management and recruitment', is_active=True),
-            MasterDataDepartment(name='Finance', code='FIN', description='Finance Department - Financial planning and accounting', is_active=True),
-            MasterDataDepartment(name='Operations', code='OPS', description='Operations Department - Daily operations and logistics', is_active=True),
-            MasterDataDepartment(name='Quality Assurance', code='QA', description='Quality Assurance Department - Testing and quality control', is_active=True)
-        ]
-        for department in departments:
-            db.session.add(department)
     
     # Create default email settings
     if EmailSettings.query.count() == 0:
