@@ -156,22 +156,6 @@ class MasterDataStatusForm(FlaskForm):
     submit = SubmitField('Save Status')
 
 
-class MasterDataDepartmentForm(FlaskForm):
-    name = StringField('Department Name', validators=[DataRequired(), Length(min=2, max=100)])
-    code = StringField('Department Code', validators=[DataRequired(), Length(min=2, max=10)], 
-                      render_kw={'placeholder': 'ENG, IT, HR, etc.'})
-    description = TextAreaField('Description', validators=[Length(max=200)])
-    head_of_department_id = SelectField('Head of Department', coerce=int, validators=[Optional()])
-    is_active = BooleanField('Active', default=True)
-    submit = SubmitField('Save Department')
-    
-    def __init__(self, *args, **kwargs):
-        super(MasterDataDepartmentForm, self).__init__(*args, **kwargs)
-        from models import User
-        
-        # Load HODs for department head selection
-        hods = User.query.filter_by(role='hod').all()
-        self.head_of_department_id.choices = [(0, 'Select HOD')] + [(user.id, user.full_name) for user in hods]
 
 
 

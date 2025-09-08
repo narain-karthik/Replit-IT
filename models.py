@@ -160,24 +160,6 @@ class MasterDataStatus(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
-class MasterDataDepartment(db.Model):
-    """Master data for departments"""
-    __tablename__ = 'master_departments'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    code = db.Column(db.String(10), nullable=False)  # Short code like ENG, IT, HR
-    description = db.Column(db.String(200), nullable=True)
-    head_of_department_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
-    is_active = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
-    # Relationship
-    head_of_department = db.relationship('User', backref='departments_headed', foreign_keys=[head_of_department_id])
-    
-    def __repr__(self):
-        return f'<Department {self.code}: {self.name}>'
 
 
 
