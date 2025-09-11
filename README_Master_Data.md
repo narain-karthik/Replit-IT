@@ -12,42 +12,7 @@ The Master Data Management system provides Super Admins with centralized control
 
 ## Master Data Components
 
-### 1. Departments Management 🏢 (NEW)
-
-**Purpose**: Manage organizational departments and assign Heads of Department (HODs)
-
-**Database Table**: `master_departments`
-**Current Departments in Database**:
-- Engineering (ENG) - Design and development
-- Information Technology (IT) - System administration and support
-- Human Resources (HR) - Employee management and recruitment
-- Finance (FIN) - Financial planning and accounting
-- Operations (OPS) - Daily operations and logistics
-- Quality Assurance (QA) - Testing and quality control
-
-**Database Structure**:
-```sql
-CREATE TABLE master_departments (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100) UNIQUE NOT NULL,
-    code VARCHAR(10) UNIQUE NOT NULL,
-    description VARCHAR(200),
-    head_of_department_id INTEGER REFERENCES users(id),
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-**Features**:
-- Department code for easy identification
-- HOD assignment to link department heads
-- Department-specific ticket visibility for HODs
-- Full department lifecycle management
-
----
-
-### 2. Categories Management 📁
+### 1. Categories Management 📁
 
 **Purpose**: Define ticket categories to classify support requests
 

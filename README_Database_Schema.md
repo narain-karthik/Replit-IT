@@ -4,21 +4,20 @@ Comprehensive documentation for the GTN Engineering IT Helpdesk System database 
 
 ## Overview
 
-The system uses a modern relational database architecture with **12 core tables** supporting user management, ticket lifecycle, collaborative comments, file attachments, comprehensive master data management, and email notification logging. Designed for PostgreSQL primary deployment with IST timezone support and optimized for Replit environment.
+The system uses a modern relational database architecture with **11 core tables** supporting user management, ticket lifecycle, collaborative comments, file attachments, comprehensive master data management, and email notification logging. Designed for PostgreSQL primary deployment with IST timezone support and optimized for Replit environment.
 
 **Database Tables:**
 1. **users** - User authentication and profile management
 2. **tickets** - Core ticket lifecycle management
 3. **ticket_comments** - Collaborative comment system
 4. **attachments** - File attachment management
-5. **master_categories** - Ticket category definitions (NEW)
-6. **master_priorities** - Priority level configuration (NEW)
-7. **master_statuses** - Status workflow definitions (NEW)
-8. **master_departments** - Department management with HOD assignments (NEW)
-9. **email_settings** - SMTP configuration (NEW)
-10. **timezone_settings** - System timezone configuration (NEW)
-11. **backup_settings** - Database backup configuration (NEW)
-12. **email_notification_logs** - Email notification tracking (NEW)
+5. **master_categories** - Ticket category definitions
+6. **master_priorities** - Priority level configuration
+7. **master_statuses** - Status workflow definitions
+8. **email_settings** - SMTP configuration
+9. **timezone_settings** - System timezone configuration
+10. **backup_settings** - Database backup configuration
+11. **email_notification_logs** - Email notification tracking
 
 ## Database Architecture
 
@@ -273,131 +272,6 @@ CREATE TABLE master_categories (
 Configurable priority levels with color coding and escalation levels.
 
 ```sql
-CREATE TABLE master_priorities (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(20) UNIQUE NOT NULL,
-    description VARCHAR(200),
-    level INTEGER NOT NULL,
-    color_code VARCHAR(7),
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-**Default Data:**
-- Low (Level 1): #28a745 (Green)
-- Medium (Level 2): #ffc107 (Yellow)
-- High (Level 3): #fd7e14 (Orange)
-- Critical (Level 4): #dc3545 (Red)
-
-### 7. Master Data Statuses (`master_statuses`)
-
-Configurable ticket status workflow with color coding.
-
-```sql
-CREATE TABLE master_statuses (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(20) UNIQUE NOT NULL,
-    description VARCHAR(200),
-    color_code VARCHAR(7),
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-**Default Data:**
-- Open: #007bff (Blue) - Newly created tickets
-- In Progress: #ffc107 (Yellow) - Active work tickets
-- Resolved: #28a745 (Green) - Completed tickets
-- Closed: #6c757d (Gray) - Finalized tickets
-
-### 8. Master Data Departments (`master_departments`)
-
-Department management with HOD assignments.
-
-```sql
-CREATE TABLE master_departments (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100) UNIQUE NOT NULL,
-    code VARCHAR(10) UNIQUE NOT NULL,
-    description VARCHAR(200),
-    head_of_department_id INTEGER REFERENCES users(id),
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-**Default Data:**
-- Engineering (ENG): Design and development
-- Information Technology (IT): System administration and support
-- Human Resources (HR): Employee management and recruitment
-- Finance (FIN): Financial planning and accounting
-- Operations (OPS): Daily operations and logistics
-- Quality Assurance (QA): Testing and quality control
-
-## System Configuration Tables
-
-### 9. Email Settings (`email_settings`)
-
-SMTP configuration for automated email notifications.
-
-```sql
-CREATE TABLE email_settings (
-    id SERIAL PRIMARY KEY,
-    smtp_server VARCHAR(100) NOT NULL DEFAULT 'smtp.gmail.com',
-    smtp_port INTEGER NOT NULL DEFAULT 587,
-    smtp_username VARCHAR(100) NOT NULL,
-    smtp_password VARCHAR(200) NOT NULL,
-    use_tls BOOLEAN DEFAULT TRUE,
-    from_email VARCHAR(100),
-    from_name VARCHAR(100) DEFAULT 'GTN IT Helpdesk',
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-### 10. Timezone Settings (`timezone_settings`)
-
-System-wide timezone configuration.
-
-```sql
-CREATE TABLE timezone_settings (
-    id SERIAL PRIMARY KEY,
-    timezone_name VARCHAR(50) NOT NULL DEFAULT 'Asia/Kolkata',
-    display_name VARCHAR(100) NOT NULL DEFAULT 'Indian Standard Time (IST)',
-    utc_offset VARCHAR(10) NOT NULL DEFAULT '+05:30',
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-### 11. Backup Settings (`backup_settings`)
-
-Database backup configuration and scheduling.
-
-```sql
-CREATE TABLE backup_settings (
-    id SERIAL PRIMARY KEY,
-    backup_frequency VARCHAR(20) NOT NULL DEFAULT 'daily',
-    backup_time TIME NOT NULL DEFAULT '02:00:00',
-    backup_location VARCHAR(200) DEFAULT '/backups',
-    max_backups INTEGER NOT NULL DEFAULT 30,
-    compress_backups BOOLEAN DEFAULT TRUE,
-    include_attachments BOOLEAN DEFAULT TRUE,
-    email_notifications BOOLEAN DEFAULT TRUE,
-    notification_email VARCHAR(100),
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-### 12. Email Notification Logs (`email_notification_logs`)
 CREATE TABLE master_priorities (
     id SERIAL PRIMARY KEY,
     name VARCHAR(20) UNIQUE NOT NULL,
