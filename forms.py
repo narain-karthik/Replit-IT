@@ -72,7 +72,6 @@ class UserRegistrationForm(FlaskForm):
     ], validators=[Optional()])
     role = SelectField('Role', choices=[
         ('user', 'User'),
-        ('hod', 'HOD (Head of Department)'),
         ('super_admin', 'Super Admin')
     ], validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
@@ -85,7 +84,6 @@ class UserProfileForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=50)])
     role = SelectField('Role', choices=[
         ('user', 'User'),
-        ('hod', 'HOD (Head of Department)'),
         ('super_admin', 'Super Admin')
     ], validators=[DataRequired()])
     first_name = StringField('First Name', validators=[DataRequired(), Length(min=2, max=50)])

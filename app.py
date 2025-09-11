@@ -176,32 +176,6 @@ with app.app_context():
         super_admin.set_password('admin123')
         db.session.add(super_admin)
         
-        # Create HOD for Engineering department
-        hod_engineering = User(
-            username='hodeng',
-            email='hod.engineering@gtn.com',
-            first_name='Engineering',
-            last_name='HOD',
-            department='Engineering',
-            role='hod'
-        )
-        hod_engineering.set_password('hod123')
-        db.session.add(hod_engineering)
-        
-        # Create HOD for IT department
-        hod_it = User(
-            username='hodit',
-            email='hod.it@gtn.com',
-            first_name='IT',
-            last_name='HOD',
-            department='IT',
-            role='hod'
-        )
-        hod_it.set_password('hod123')
-        db.session.add(hod_it)
-        
-
-        
         # Create test users in different departments
         test_user_eng = User(
             username='testuser_eng',
@@ -225,7 +199,7 @@ with app.app_context():
         test_user_it.set_password('user123')
         db.session.add(test_user_it)
         
-        logging.info("Default users created: Super Admin, HODs, and Test Users")
+        logging.info("Default users created: Super Admin and Test Users")
     
     try:
         db.session.commit()
