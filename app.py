@@ -9,7 +9,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from utils.timezone import utc_to_ist
 
 # Configure logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 
 class Base(DeclarativeBase):
