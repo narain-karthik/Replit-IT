@@ -93,7 +93,7 @@
                         
                         <h6>Description:</h6>
                         <div class="bg-light p-3 rounded">
-                            {{ ticket.description | nl2br }}
+                            {{ ticket.description | nl2br | safe }}
                         </div>
                         
                         {% if (ticket.image_filename or ticket.attachments) and (user.is_super_admin or ticket.user_id == user.id) %}
@@ -170,7 +170,7 @@
         <strong>{{ comment.user.full_name }}</strong>
         <small class="text-muted">{{ comment.created_at|to_ist }}</small>
     </div>
-    <p class="mb-0 mt-1">{{ comment.comment | nl2br }}</p>
+    <p class="mb-0 mt-1">{{ comment.comment | nl2br | safe }}</p>
 </div>
                             {% endfor %}
                         {% else %}
